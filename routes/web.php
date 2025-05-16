@@ -15,6 +15,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::get('/institutions', [InstitutionController::class, 'index'])->name('institutions.index');
 Route::get('/institutions/create', [InstitutionController::class, 'create'])->name('institutions.create');
+Route::post('/institutions', [InstitutionController::class, 'store'])->name('institutions.store');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

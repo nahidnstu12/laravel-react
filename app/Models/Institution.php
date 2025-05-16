@@ -21,4 +21,9 @@ class Institution extends Model
         'limit',
         'extra_infos',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

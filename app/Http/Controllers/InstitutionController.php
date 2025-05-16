@@ -3,14 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Institution;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 
 class InstitutionController extends Controller
 {
     public function index()
     {
-        return Inertia::render('institution/index');
+        $institutions = Institution::with('user')->get();
+        return Inertia::render('institution/index', compact('institutions'));
     }
     public function create()
     {
@@ -21,10 +27,12 @@ class InstitutionController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string',
+            'user_name' => 'required|string',
+            'user_email' => 'required|email',
             'registration_no' => 'nullable|string',
             'no_of_students' => 'nullable|integer',
             'no_of_teachers' => 'nullable|integer',
-            'type' => 'required|integer',
+            'type' => 'required|string',
             'cover_photo' => 'nullable|exists:images,id',
             'logo' => 'nullable|exists:images,id',
             'location' => 'nullable|string',
@@ -33,8 +41,41 @@ class InstitutionController extends Controller
             'extra_infos' => 'nullable|json',
     ]);
 
-    Institution::create($validated + ['uuid' => Str::uuid()]);
+    // Institution::create($validated + ['uuid' => Str::uuid()]);
 
-    return redirect()->route('institutions.index')->with('success', 'Institution created successfully!');
+    DB::beginTransaction();
+
+    try {
+        // Create user
+        $user = User::create([
+            'name' => $validated['user_name'],
+            'email' => $validated['user_email'],
+            'password' => Hash::make("password"), // or a default one
+        ]);
+
+        // Create institution
+         Institution::create([
+            'user_id' => $user->id,
+            'uuid' => Str::uuid(),
+            'name' => $validated['name'],
+            'registration_no' => $validated['registration_no'] ?? null,
+            'no_of_students' => $validated['no_of_students'] ?? null,
+            'no_of_teachers' => $validated['no_of_teachers'] ?? null,
+            'type' => $validated['type'],
+            'cover_photo' => $validated['cover_photo'] ?? null,
+            'logo' => $validated['logo'] ?? null,
+            'location' => $validated['location'] ?? null,
+            'status' => $validated['status'] ?? true,
+            'limit' => $validated['limit'] ?? null,
+            'extra_infos' => $validated['extra_infos'] ?? null,
+        ]);
+
+        DB::commit();
+        return to_route('institutions.index')->with('success', 'Institution created successfully!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Failed to create institution. Please try again.');
+    }
+   
 }
 }

@@ -6,26 +6,32 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm } from '@inertiajs/react';
 
-export default function InstitutionCreateForm({ users = [], images = [] }) {
+export default function InstitutionCreateForm() {
   const { data, setData, post, processing, errors, reset } = useForm({
-    user_id: '',
+    user_name: '',
     name: '',
     registration_no: '',
     no_of_students: '',
     no_of_teachers: '',
-    type: '1', // Assuming you map integer to enum in backend
+    type: 'primary', 
     cover_photo: '',
     logo: '',
     location: '',
     status: true,
     limit: '',
     extra_infos: '',
+    user_email: '',
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    post(route('institutions.store'));
+    post(route('institutions.store'), {
+      preserveScroll: true,
+    });
   };
+
+  console.log("institution create errors", errors);
+  console.log("institution create data", data);
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -33,20 +39,14 @@ export default function InstitutionCreateForm({ users = [], images = [] }) {
         <h1 className="text-2xl font-bold text-center">Create Institution</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label>User</Label>
-            {/* <select
-              value={data.user_id}
-              onChange={(e) => setData('user_id', e.target.value)}
-              className="w-full border rounded p-2"
-            >
-              <option value="">Select User</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select> */}
-            {/* {errors.user_id && <p className="text-red-500">{errors.user_id}</p>} */}
+            <Label>User Name</Label>
+            <Input value={data.user_name} onChange={(e) => setData('user_name', e.target.value)} />
+            {errors.user_name && <p className="text-red-500">{errors.user_name}</p>}
+          </div>
+          <div>
+            <Label>User Email</Label>
+            <Input value={data.user_email} onChange={(e) => setData('user_email', e.target.value)} />
+            {errors.user_email && <p className="text-red-500">{errors.user_email}</p>}
           </div>
 
           <div>
@@ -59,7 +59,7 @@ export default function InstitutionCreateForm({ users = [], images = [] }) {
             <Label>Registration No</Label>
             <Input value={data.registration_no} onChange={(e) => setData('registration_no', e.target.value)} />
           </div>
-
+          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>No of Students</Label>
