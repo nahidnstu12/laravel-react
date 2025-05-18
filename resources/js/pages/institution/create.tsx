@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
 import { useForm } from '@inertiajs/react';
 
 export default function InstitutionCreateForm() {
@@ -17,7 +19,7 @@ export default function InstitutionCreateForm() {
     cover_photo: '',
     logo: '',
     location: '',
-    status: true,
+    status: true as const,
     limit: '',
     extra_infos: '',
     user_email: '',
@@ -33,7 +35,19 @@ export default function InstitutionCreateForm() {
   console.log("institution create errors", errors);
   console.log("institution create data", data);
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: 'Institutions',
+      href: '/institutions',
+    },
+    {
+      title: 'Create Institution',
+      href: '/institutions/create',
+    },
+  ];
+
   return (
+    <AppLayout breadcrumbs={breadcrumbs}>
     <Card className="max-w-2xl mx-auto">
       <CardContent className="space-y-6 p-6">
         <h1 className="text-2xl font-bold text-center">Create Institution</h1>
@@ -123,7 +137,7 @@ export default function InstitutionCreateForm() {
           <div>
             <Label>Status</Label>
             <div className="flex items-center space-x-2">
-              <Switch checked={data.status} onCheckedChange={(val) => setData('status', val)} />
+              <Switch checked={data.status} onCheckedChange={(val) => setData('status', val as true)} />
               <span>{data.status ? 'Active' : 'Inactive'}</span>
             </div>
           </div>
@@ -145,5 +159,6 @@ export default function InstitutionCreateForm() {
         </form>
       </CardContent>
     </Card>
+    </AppLayout>
   );
 }

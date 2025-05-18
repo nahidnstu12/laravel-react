@@ -1,4 +1,3 @@
-import * as React from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -11,7 +10,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, ChevronDown, Eye, Pencil, Plus, Trash } from "lucide-react"
+import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -19,10 +19,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import {
@@ -33,8 +30,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import AppLayout from "@/layouts/app-layout"
+import { BreadcrumbItem } from "@/types"
+import { Link } from "@inertiajs/react"
 
-
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+      title: 'Institutions',
+      href: '/institutions',
+  },
+];
 
 
 export type Institution = {
@@ -121,14 +126,7 @@ export const columns: ColumnDef<Institution>[] = [
       return <div className="text-right font-medium">{registration_no}</div>
     },
   },
-  {
-    accessorKey: "uuid",
-    header: () => <div className="text-right">UUID</div>,
-    cell: ({ row }) => {
-      const uuid = row.getValue("uuid") as string
-      return <div className="text-right font-medium">{uuid}</div>
-    },
-  },
+  
   {
     accessorKey: "no_of_students",
     header: () => <div className="text-right">No of Students</div>,
@@ -157,38 +155,28 @@ export const columns: ColumnDef<Institution>[] = [
   {
     id: "actions",
     enableHiding: false,
-    header: () => <div className="text-right">Actions</div>,
+    header: () => <div className="text-center">Actions</div>,
     cell: ({ row }) => {
-      const payment = row.original
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex justify-center gap-2">
+          <Link href={`/institutions/${row.original.id}/view`}>
+            <Button variant="outline"><Eye/> </Button>
+          </Link>
+          <Link href={`/institutions/${row.original.id}/edit`}>
+            <Button variant="outline"><Pencil/> </Button>
+          </Link>
+          <Link href={`/institutions/${row.original.id}/delete`}>
+            <Button variant="outline"><Trash/> </Button>
+          </Link>
+        </div>
       )
     },
   },
 ]
 
-export function DataTableDemo({ institutions }: { institutions: Institution[] }) {
+function InstitutionList({ institutions }: { institutions: Institution[] }) {
 
-  console.log("institutions", institutions);
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -217,6 +205,7 @@ export function DataTableDemo({ institutions }: { institutions: Institution[] })
   })
 
   return (
+    <AppLayout breadcrumbs={breadcrumbs}>
     <div className="container mx-auto w-full my-10">
       {/* <h1 className="text-2xl font-bold text-center mb-4">Institutions List</h1> */}
       <div className="flex items-center py-4">
@@ -254,6 +243,12 @@ export function DataTableDemo({ institutions }: { institutions: Institution[] })
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button variant="outline" className="ml-1" asChild>
+          <Link href="/institutions/create">
+            <Plus />
+            Add Institution
+          </Link>
+        </Button>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -330,7 +325,8 @@ export function DataTableDemo({ institutions }: { institutions: Institution[] })
         </div>
       </div>
     </div>
+    </AppLayout>
   )
 }
 
-export default DataTableDemo
+export default InstitutionList
