@@ -1,16 +1,29 @@
-import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from '@tanstack/react-table';
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    SortingState,
+    useReactTable,
+    VisibilityState,
+} from '@tanstack/react-table';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useState } from 'react';
 import BottomContent from './BottomContent';
 import TopContent from './TopContent';
-import { useState } from 'react';
+import { DrawerMode } from '@/hooks/useDrawer';
 
 interface DataTableProps<T> {
     columns: ColumnDef<T>[];
     data: T[];
+    openDrawer: (mode: DrawerMode, id?: string) => void;
 }
 
-export default function DataTable<T>({ columns, data }: DataTableProps<T>) {
+export default function DataTable<T>({ columns, data, openDrawer }: DataTableProps<T>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -36,7 +49,7 @@ export default function DataTable<T>({ columns, data }: DataTableProps<T>) {
     });
     return (
         <>
-            <TopContent columns={columns} data={data} table={table} />
+            <TopContent table={table} openDrawer={openDrawer} />
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

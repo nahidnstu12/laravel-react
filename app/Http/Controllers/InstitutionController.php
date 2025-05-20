@@ -28,7 +28,7 @@ class InstitutionController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'user_name' => 'required|string',
-            'user_email' => 'required|email',
+            'user_email' => 'required|email|unique:users,email',
             'registration_no' => 'nullable|string',
             'no_of_students' => 'nullable|integer',
             'no_of_teachers' => 'nullable|integer',
@@ -77,5 +77,27 @@ class InstitutionController extends Controller
         return redirect()->back()->with('error', 'Failed to create institution. Please try again.');
     }
    
-}
+    }
+
+    public function show($id)
+    {
+        $institution = Institution::with('user')->findOrFail($id);
+        return response()->json($institution);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $institution = Institution::findOrFail($id);
+        $institution->update($request->all());
+        return redirect()->back()->with('success', 'Institution updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $institution = Institution::findOrFail($id);
+        $institution->delete();
+        return redirect()->back()->with('success', 'Institution deleted successfully!');
+    }
+
+
 }

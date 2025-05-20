@@ -1,14 +1,14 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Eye, Pencil, Trash } from 'lucide-react';
-
+import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import DataTable from '@/components/datatable';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import useDrawer from '@/hooks/useDrawer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+import { ColumnDef } from '@tanstack/react-table';
+import { ArrowUpDown, Eye, Pencil, Trash } from 'lucide-react';
 import { DrawerContainer } from './drawer';
-import { useCallback } from 'react';
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Institutions',
@@ -115,8 +115,9 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
             accessorKey: 'type',
             header: () => <div className="text-right">Type</div>,
             cell: ({ row }) => {
-                const type = row.getValue('type') as string;
-                return <div className="text-right font-medium">{type}</div>;
+                const type = Number(row.getValue('type'));
+
+                return <div className="text-right font-medium">{type === 3 ? 'Collage' : type === 2 ? 'Secondary' : 'Primary'}</div>;
             },
         },
 
@@ -133,33 +134,30 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
                         <Button variant="outline" onClick={() => openDrawer('edit', row.original.id)}>
                             <Pencil />{' '}
                         </Button>
-                        <Button variant="outline" onClick={() => handleDelete(row.original.id)}>
-                            <Trash />{' '}
-                        </Button>
+                        <ConfirmationDialog
+                            title="Delete Institution"
+                            description="Are you sure you want to delete this institution?"
+                            deleteText="Delete"
+                            cancelText="Cancel"
+                            route={route('institutions.destroy', row.original.id)}
+                        >
+                            <Button variant="outline">
+                                <Trash />{' '}
+                            </Button>
+                        </ConfirmationDialog>
                     </div>
                 );
             },
         },
     ];
 
-    const handleSave = () => {
-        console.log('handleSave');
-    };
-
-    const handleDelete = useCallback((id: string) => {
-      // Implement delete logic or confirmation dialog
-      console.log('Delete institution', id);
-    }, []);
-
-    const isLoading = false;
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto my-10 w-full">
                 <h1 className="mb-4 text-center text-2xl font-bold">Institutions List</h1>
-                <DataTable columns={columns} data={institutions} />
+                <DataTable columns={columns} data={institutions} openDrawer={openDrawer} />
             </div>
-            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} handleSave={handleSave} isLoading={isLoading} mode={mode} itemId={itemId} />
+            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} />
         </AppLayout>
     );
 }

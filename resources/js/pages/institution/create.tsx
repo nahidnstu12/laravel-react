@@ -8,6 +8,8 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { useForm } from '@inertiajs/react';
 
+// TODO: REMOVE THIS FILE LATER
+
 export default function InstitutionCreateForm() {
     const { data, setData, post, processing, errors, reset } = useForm({
         user_name: '',
