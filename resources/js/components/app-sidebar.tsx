@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Building2, LayoutGrid } from 'lucide-react';
+import { Book, Building2, LayoutGrid, Triangle, User } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -14,15 +14,29 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: "Institutions",
-        href: "/institutions",
+        title: 'Institutions',
+        href: '/institutions',
         icon: Building2,
     },
-];
-
-const footerNavItems: NavItem[] = [
+    {
+        title: 'Teachers',
+        href: '/teachers',
+        icon: User,
+    },
+    {
+        title: 'Levels',
+        href: '/levels',
+        icon: Triangle,
+    },
+    {
+        title: 'Subjects',
+        href: '/subjects',
+        icon: Book,
+    },
     
 ];
+
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     return (

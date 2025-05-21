@@ -21,9 +21,10 @@ interface DataTableProps<T> {
     columns: ColumnDef<T>[];
     data: T[];
     openDrawer: (mode: DrawerMode, id?: string) => void;
+    title: string;
 }
 
-export default function DataTable<T>({ columns, data, openDrawer }: DataTableProps<T>) {
+export default function DataTable<T>({ columns, data, openDrawer, title }: DataTableProps<T>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -49,7 +50,7 @@ export default function DataTable<T>({ columns, data, openDrawer }: DataTablePro
     });
     return (
         <>
-            <TopContent table={table} openDrawer={openDrawer} />
+            <TopContent table={table} openDrawer={openDrawer} title={title} />
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

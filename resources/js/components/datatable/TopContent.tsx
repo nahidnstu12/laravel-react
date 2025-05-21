@@ -7,9 +7,10 @@ import { ChevronDown, Plus } from 'lucide-react';
 interface TopContentProps<T> {
     table: Table<T>;
     openDrawer: (mode: DrawerMode, id?: string) => void;
+    title: string;
 }
 
-export default function TopContent<T>({ table, openDrawer }: TopContentProps<T>) {
+export default function TopContent<T>({ table, openDrawer, title }: TopContentProps<T>) {
     return (
         <div className="flex items-center py-4">
             <Input
@@ -44,7 +45,7 @@ export default function TopContent<T>({ table, openDrawer }: TopContentProps<T>)
             </DropdownMenu>
             <Button variant="outline" className="ml-1 cursor-pointer" onClick={() => openDrawer('create')}>
                 <Plus />
-                Add Institution
+                Add {title}
             </Button>
         </div>
     );

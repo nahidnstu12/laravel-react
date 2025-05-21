@@ -15,18 +15,20 @@ interface DrawerProps {
 
 export function DrawerContainer({ isOpen, onClose, mode, itemId }: DrawerProps) {
     const { data, setData, post, patch, processing, errors, reset } = useForm({
-        user_name: '',
         name: '',
-        registration_no: '',
-        no_of_students: '',
-        no_of_teachers: '',
-        type: 'primary',
-        cover_photo: '',
-        logo: '',
+        pds_id: '',
+        designation: '',
+        phone: '',
+        address: '',
+        status: '',
+        created_at: '',
+        updated_at: '',
         location: '',
-        status: true as const,
-        limit: '',
-        extra_infos: '',
+        joining_date: '',
+        user: {
+            id: '',
+        },
+        user_name: '',
         user_email: '',
     });
 
@@ -34,68 +36,67 @@ export function DrawerContainer({ isOpen, onClose, mode, itemId }: DrawerProps) 
         if (isOpen && itemId && (mode === 'read' || mode === 'edit')) {
             // Fetch institution data
             axios
-                .get(route('institutions.show', itemId))
+                .get(route('teachers.show', itemId))
                 .then((response) => {
-                    const institutionData = {
+                    const teacherData = {
                         user_name: response.data.user?.name || '',
                         name: response.data.name || '',
-                        registration_no: response.data.registration_no || '',
-                        no_of_students: response.data.no_of_students || '',
-                        no_of_teachers: response.data.no_of_teachers || '',
-                        type: response.data.type || 1,
-                        cover_photo: response.data.cover_photo || '',
-                        logo: response.data.logo || '',
+                        pds_id: response.data.pds_id || '',
+                        designation: response.data.designation || '',
+                        phone: response.data.phone || '',
+                        address: response.data.address || '',
+                        status: response.data.status || '',
+                        created_at: response.data.created_at || '',
+                        updated_at: response.data.updated_at || '',
                         location: response.data.location || '',
-                        status: response.data.status || true,
-                        limit: response.data.limit || '',
-                        extra_infos: response.data.extra_infos || '',
+                        joining_date: response.data.joining_date || '',
+                        user: {
+                            id: response.data.user?.id || '',
+                        },
                         user_email: response.data.user?.email || '',
                     };
-                    setData(institutionData);
+                    setData(teacherData);
                 })
                 .catch((error) => {
-                    console.error('Error fetching institution:', error);
+                    console.error('Error fetching teacher:', error);
                 });
         }
     }, [isOpen, itemId, mode]);
 
     const handleSubmit = () => {
         if (mode === 'create') {
-            post(route('institutions.store'), {
+            post(route('teachers.store'), {
                 preserveScroll: true,
                 onSuccess: () => {
                     // onClose();
                     reset();
                 },
             });
-           
         } else if (mode === 'edit') {
-            patch(route('institutions.update', itemId), {
+            patch(route('teachers.update', itemId), {
                 preserveScroll: true,
                 onSuccess: () => {
                     // onClose();
                     // reset();
                 },
             });
-           
         }
     };
 
     const getTitle = () => {
         switch (mode) {
             case 'create':
-                return 'Add New Institution';
+                return 'Add New Teacher';
             case 'read':
-                return 'Institution Details';
+                return 'Teacher Details';
             case 'edit':
-                return 'Edit Institution';
+                return 'Edit Teacher';
             default:
-                return 'Institution';
+                return 'Teacher';
         }
     };
 
-  console.log("errors>>", errors);
-  
+    console.log('errors>>', errors, 'data>>', data);
 
     return (
         <Drawer open={isOpen} onOpenChange={onClose} direction="right">
@@ -123,7 +124,7 @@ export function DrawerContainer({ isOpen, onClose, mode, itemId }: DrawerProps) 
                         <DrawerFooter className="border-t">
                             <div className="flex gap-2">
                                 <Button onClick={handleSubmit} disabled={processing} className="w-1/2">
-                                    {processing ? 'Saving...' : 'Save Changes'}
+                                    {processing ? 'Saving...' : 'Save'}
                                 </Button>
                                 <DrawerClose asChild>
                                     <Button variant="outline" className="w-1/2" onClick={() => reset()}>

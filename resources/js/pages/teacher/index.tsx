@@ -11,20 +11,20 @@ import { DrawerContainer } from './drawer';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Institutions',
-        href: '/institutions',
+        title: 'Teachers',
+        href: '/teachers',
     },
 ];
 
-export type Institution = {
+export type Teacher = {
     id: string;
     name: string;
-    registration_no: string;
-    no_of_students: number;
-    no_of_teachers: number;
-    type: string;
-    cover_photo: string;
-    logo: string;
+    email: string;
+    phone: string;
+    address: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
     location: string;
     user: {
         id: number;
@@ -36,10 +36,10 @@ export type Institution = {
     };
 };
 
-function InstitutionList({ institutions }: { institutions: Institution[] }) {
+function TeacherList({ teachers }: { teachers: Teacher[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
-    const columns: ColumnDef<Institution>[] = [
+    const columns: ColumnDef<Teacher>[] = [
         {
             id: 'select',
             header: ({ table }) => (
@@ -87,40 +87,46 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
             },
         },
         {
-            accessorKey: 'registration_no',
-            header: () => <div className="text-right">Registration No</div>,
+            accessorKey: 'pds_id',
+            header: () => <div className="text-right">PDS ID</div>,
             cell: ({ row }) => {
-                const registration_no = row.getValue('registration_no') as string;
-                return <div className="text-right font-medium">{registration_no}</div>;
+                const pds_id = row.getValue('pds_id') as string;
+                return <div className="text-right font-medium">{pds_id}</div>;
             },
         },
 
         {
-            accessorKey: 'no_of_students',
-            header: () => <div className="text-right">No of Students</div>,
+            accessorKey: 'designation',
+            header: () => <div className="text-right">Designation</div>,
             cell: ({ row }) => {
-                const no_of_students = row.getValue('no_of_students') as number;
-                return <div className="text-right font-medium">{no_of_students}</div>;
+                const designation = row.getValue('designation') as string;
+                return <div className="text-right font-medium">{designation}</div>;
             },
         },
         {
-            accessorKey: 'no_of_teachers',
-            header: () => <div className="text-right">No of Teachers</div>,
+            accessorKey: 'phone',
+            header: () => <div className="text-right">Phone</div>,
             cell: ({ row }) => {
-                const no_of_teachers = row.getValue('no_of_teachers') as number;
-                return <div className="text-right font-medium">{no_of_teachers}</div>;
+                const phone = row.getValue('phone') as string;
+                return <div className="text-right font-medium">{phone}</div>;
             },
         },
         {
-            accessorKey: 'type',
-            header: () => <div className="text-right">Type</div>,
+            accessorKey: 'address',
+            header: () => <div className="text-right">Address</div>,
             cell: ({ row }) => {
-                const type = Number(row.getValue('type'));
-
-                return <div className="text-right font-medium">{type === 3 ? 'Collage' : type === 2 ? 'Secondary' : 'Primary'}</div>;
+                const address = row.getValue('address') as string;
+                return <div className="text-right font-medium">{address}</div>;
             },
         },
-
+        {
+            accessorKey: 'status',
+            header: () => <div className="text-right">Status</div>,
+            cell: ({ row }) => {
+                const status = row.getValue('status') as string;
+                return <div className="text-right font-medium">{status}</div>;
+            },
+        },
         {
             id: 'actions',
             enableHiding: false,
@@ -135,11 +141,11 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
                             <Pencil />{' '}
                         </Button>
                         <ConfirmationDialog
-                            title="Delete Institution"
-                            description="Are you sure you want to delete this institution?"
+                            title="Delete Teacher"
+                            description="Are you sure you want to delete this teacher?"
                             deleteText="Delete"
                             cancelText="Cancel"
-                            route={route('institutions.destroy', row.original.id)}
+                            route={route('teachers.destroy', row.original.id)}
                         >
                             <Button variant="outline">
                                 <Trash />{' '}
@@ -154,12 +160,12 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto my-10 w-full">
-                <h1 className="mb-4 text-center text-2xl font-bold">Institutions List</h1>
-                <DataTable columns={columns} data={institutions} openDrawer={openDrawer} title="Institution" />
+                <h1 className="mb-4 text-center text-2xl font-bold">Teachers List</h1>
+                <DataTable columns={columns} data={teachers} openDrawer={openDrawer} title="Teacher" />
             </div>
             <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} />
         </AppLayout>
     );
 }
 
-export default InstitutionList;
+export default TeacherList;

@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\InstitutionController;
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
@@ -13,12 +12,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::get('/institutions', [InstitutionController::class, 'index'])->name('institutions.index');
-Route::get('/institutions/create', [InstitutionController::class, 'create'])->name('institutions.create');
-Route::post('/institutions', [InstitutionController::class, 'store'])->name('institutions.store');
-Route::get('/institutions/{id}', [InstitutionController::class, 'show'])->name('institutions.show');
-Route::patch('/institutions/{id}', [InstitutionController::class, 'update'])->name('institutions.update');
-Route::delete('/institutions/{id}', [InstitutionController::class, 'destroy'])->name('institutions.destroy');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+require __DIR__.'/institution.php';
