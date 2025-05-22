@@ -8,6 +8,7 @@ import { BreadcrumbItem } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Eye, Pencil, Trash } from 'lucide-react';
 import { DrawerContainer } from './drawer';
+import { Institution } from '../institution';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,25 +19,24 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export type Teacher = {
     id: string;
-    name: string;
-    email: string;
-    phone: string;
     address: string;
     status: string;
-    created_at: string;
-    updated_at: string;
+    designation: string;
+    pds_id: string;
+    joining_date: Date;
     location: string;
     user: {
         id: number;
         name: string;
         email: string;
-        email_verified_at: string | null;
-        created_at: string;
-        updated_at: string;
+    };
+    institution: {
+        id: number;
+        name: string;
     };
 };
 
-function TeacherList({ teachers }: { teachers: Teacher[] }) {
+function TeacherList({ teachers, institutions }: { teachers: Teacher[], institutions: Institution[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
     const columns: ColumnDef<Teacher>[] = [
@@ -56,18 +56,7 @@ function TeacherList({ teachers }: { teachers: Teacher[] }) {
             enableHiding: false,
         },
 
-        {
-            accessorKey: 'name',
-            header: ({ column }) => {
-                return (
-                    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                        Name
-                        <ArrowUpDown />
-                    </Button>
-                );
-            },
-            cell: ({ row }) => <div className="lowercase">{row.getValue('name')}</div>,
-        },
+        
         {
             accessorFn: (row) => row.user.name,
             id: 'user.name',
@@ -87,6 +76,15 @@ function TeacherList({ teachers }: { teachers: Teacher[] }) {
             },
         },
         {
+            accessorFn: (row) => row.institution.name,
+            id: 'institution.name',
+            header: () => <div className="text-right">Institution</div>,
+            cell: ({ row }) => {
+                const institution = row.original.institution.name;
+                return <div className="text-right font-medium">{institution}</div>;
+            },
+        },
+        {
             accessorKey: 'pds_id',
             header: () => <div className="text-right">PDS ID</div>,
             cell: ({ row }) => {
@@ -103,14 +101,7 @@ function TeacherList({ teachers }: { teachers: Teacher[] }) {
                 return <div className="text-right font-medium">{designation}</div>;
             },
         },
-        {
-            accessorKey: 'phone',
-            header: () => <div className="text-right">Phone</div>,
-            cell: ({ row }) => {
-                const phone = row.getValue('phone') as string;
-                return <div className="text-right font-medium">{phone}</div>;
-            },
-        },
+        
         {
             accessorKey: 'address',
             header: () => <div className="text-right">Address</div>,
@@ -163,7 +154,7 @@ function TeacherList({ teachers }: { teachers: Teacher[] }) {
                 <h1 className="mb-4 text-center text-2xl font-bold">Teachers List</h1>
                 <DataTable columns={columns} data={teachers} openDrawer={openDrawer} title="Teacher" />
             </div>
-            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} />
+            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} options={{institutions}} />
         </AppLayout>
     );
 }

@@ -11,16 +11,17 @@ interface DrawerProps {
     onClose: () => void;
     mode: 'create' | 'read' | 'edit' | 'delete';
     itemId: string | undefined;
+    options: Record<string, any[]>;
 }
 
-export function DrawerContainer({ isOpen, onClose, mode, itemId }: DrawerProps) {
+export function DrawerContainer({ isOpen, onClose, mode, itemId, options }: DrawerProps) {
     const { data, setData, post, patch, processing, errors, reset } = useForm({
-        name: '',
         pds_id: '',
         designation: '',
-        phone: '',
         address: '',
-        status: '',
+        status: false,
+        institution_id: '',
+        district: '',
         created_at: '',
         updated_at: '',
         location: '',
@@ -43,17 +44,18 @@ export function DrawerContainer({ isOpen, onClose, mode, itemId }: DrawerProps) 
                         name: response.data.name || '',
                         pds_id: response.data.pds_id || '',
                         designation: response.data.designation || '',
-                        phone: response.data.phone || '',
                         address: response.data.address || '',
-                        status: response.data.status || '',
+                        status: response.data.status || false,
                         created_at: response.data.created_at || '',
                         updated_at: response.data.updated_at || '',
                         location: response.data.location || '',
                         joining_date: response.data.joining_date || '',
+                        institution_id: response.data.institution_id || '',
                         user: {
                             id: response.data.user?.id || '',
                         },
                         user_email: response.data.user?.email || '',
+                        district: response.data.district || '',
                     };
                     setData(teacherData);
                 })
@@ -117,7 +119,7 @@ export function DrawerContainer({ isOpen, onClose, mode, itemId }: DrawerProps) 
                     </DrawerHeader>
                     <div className="flex-1 overflow-y-auto p-4">
                         <form onSubmit={handleSubmit} className="w-full space-y-4">
-                            <Form data={data} setData={setData} errors={errors} mode={mode} />
+                            <Form data={data} setData={setData} errors={errors} mode={mode} options={options} />
                         </form>
                     </div>
                     {mode !== 'read' && (

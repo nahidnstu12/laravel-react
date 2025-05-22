@@ -44,13 +44,13 @@ export default function FormDatePicker({ label, value, onChange, errors, disable
     }, []);
 
     return (
-        <div className="flex flex-col" ref={containerRef}>
+        <div className="flex flex-col gap-2" ref={containerRef}>
             <Label>{label}</Label>
 
             <div className="relative">
                 <Button
                     variant="outline"
-                    className={cn('w-[240px] justify-between', !value && 'text-muted-foreground')}
+                    className={cn('w-full justify-between', !value && 'text-muted-foreground')}
                     disabled={disabled}
                     onClick={() => setOpen(!open)}
                     type="button"

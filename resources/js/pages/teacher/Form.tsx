@@ -1,5 +1,6 @@
 import FormDatePicker from '@/components/forms/FormDatePicker';
 import FormInput from '@/components/forms/FormInput';
+import { FormSelect } from '@/components/forms/FormSelect';
 import FormSwitch from '@/components/forms/FormSwitch';
 
 interface FormProps {
@@ -7,9 +8,10 @@ interface FormProps {
     setData: (key: string, value: any) => void;
     errors: Record<string, string>;
     mode: 'create' | 'read' | 'edit' | 'delete';
+    options: Record<string, any[]>;
 }
 
-export default function Form({ data, setData, errors, mode }: FormProps) {
+export default function Form({ data, setData, errors, mode, options }: FormProps) {
     const isReadOnly = mode === 'read';
 
     return (
@@ -31,7 +33,15 @@ export default function Form({ data, setData, errors, mode }: FormProps) {
                 errors={errors}
                 disabled={isReadOnly}
             />
-            <FormInput
+            <FormSelect
+                label="Institution"
+                name="institution_id"
+                value={data.institution_id}
+                onChange={(value) => setData('institution_id', value)}
+                errors={errors}
+                options={options.institutions}
+            />
+            {/* <FormInput
                 label="Phone"
                 name="phone"
                 value={data.phone}
@@ -39,18 +49,18 @@ export default function Form({ data, setData, errors, mode }: FormProps) {
                 errors={errors}
                 type="number"
                 disabled={isReadOnly}
-            />
+            /> */}
 
             {/* Teacher Details */}
 
-            <FormInput
+            {/* <FormInput
                 label="Teacher Name"
                 name="name"
                 value={data.name}
                 onChange={(e) => setData('name', e.target.value)}
                 errors={errors}
                 disabled={isReadOnly}
-            />
+            /> */}
 
             <FormInput
                 label="PDS ID"
@@ -67,7 +77,6 @@ export default function Form({ data, setData, errors, mode }: FormProps) {
                 value={data.designation}
                 onChange={(e) => setData('designation', e.target.value)}
                 errors={errors}
-                type="number"
                 disabled={isReadOnly}
             />
 

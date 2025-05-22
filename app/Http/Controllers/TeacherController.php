@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Institution;
 use Illuminate\Http\Request;
 use App\Models\Teacher;
 use App\Models\User;
@@ -15,14 +16,14 @@ class TeacherController extends Controller
 {
   public function index()
   {
-    $teachers = Teacher::all();
-    return Inertia::render('teacher/index', compact('teachers'));
+    $teachers = Teacher::with('institution', 'user')->get();
+    $institutions = Institution::all();
+    return Inertia::render('teacher/index', compact('teachers', 'institutions'));
   }
 
   public function store(Request $request)
   {
     $validated = $request->validate([
-      'name' => 'required|string',
       'user_name' => 'required|string',
       'user_email' => 'required|email|unique:users,email',
       'pds_id' => 'nullable|string',
@@ -31,6 +32,7 @@ class TeacherController extends Controller
       'address' => 'nullable|string',
       'district' => 'nullable|string',
       'status' => 'boolean',
+      'institution_id' => 'required|exists:institutions,id',
     ]);
 
     DB::beginTransaction();
@@ -44,6 +46,7 @@ class TeacherController extends Controller
 
       Teacher::create([
         'user_id' => $user->id,
+        'institution_id' => $validated['institution_id'],
         'pds_id' => $validated['pds_id'],
         'designation' => $validated['designation'],
         'joining_date' => $validated['joining_date'],
@@ -56,6 +59,7 @@ class TeacherController extends Controller
 
       return to_route('teachers.index')->with('success', 'Teacher created successfully!');
     } catch (\Throwable $th) {
+      dd($th);
       DB::rollBack();
       return redirect()->back()->with('error', 'Failed to create teacher. Please try again.');
     }
@@ -63,7 +67,7 @@ class TeacherController extends Controller
 
   public function show($id)
   {
-    $teacher = Teacher::findOrFail($id);
+    $teacher = Teacher::with('institution', 'user')->findOrFail($id);
     return response()->json($teacher);
   }
 
@@ -71,13 +75,13 @@ class TeacherController extends Controller
   {
     $teacher = Teacher::findOrFail($id);
     $teacher->update($request->all());
-    return response()->json($teacher);
+    return redirect()->back()->with('success', 'Teacher updated successfully!');
   }
 
   public function destroy($id)
   {
     $teacher = Teacher::findOrFail($id);
     $teacher->delete();
-    return response()->json($teacher);
+    return redirect()->back()->with('success', 'Teacher deleted successfully!');
   }
 }
