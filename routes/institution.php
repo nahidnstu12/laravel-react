@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InstitutionController;
+use App\Http\Controllers\LevelController;
+use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 
 // Route::get('/institutions', [InstitutionController::class, 'index'])->name('institutions.index');
@@ -15,5 +17,9 @@ use App\Http\Controllers\TeacherController;
 
 Route::resource('institutions', InstitutionController::class)->except(['edit']);
 Route::resource('teachers', TeacherController::class)->except(['create', 'edit']);
+Route::resource('subjects', SubjectController::class)->except(['create', 'edit']);
+Route::resource('levels', LevelController::class)->except(['create', 'edit']);
 
 
+// API route for fetching institution levels
+Route::get('/api/institutions/{id}/levels', [InstitutionController::class, 'levels'])->name('api.institutions.levels');

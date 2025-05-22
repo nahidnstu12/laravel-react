@@ -11,12 +11,19 @@ interface TopContentProps<T> {
 }
 
 export default function TopContent<T>({ table, openDrawer, title }: TopContentProps<T>) {
+    // Get the first text-based column for search
+    const searchColumn = table.getAllColumns().find(column => 
+        column.id !== 'select' && 
+        column.id !== 'actions' && 
+        typeof table.getRowModel().rows[0]?.getValue(column.id) === 'string'
+    );
+
     return (
         <div className="flex items-center py-4">
             <Input
-                placeholder="Filter emails..."
-                value={(table.getColumn('user.email')?.getFilterValue() as string) ?? ''}
-                onChange={(event) => table.getColumn('user.email')?.setFilterValue(event.target.value)}
+                placeholder={`Filter ${searchColumn?.id || ''}...`}
+                value={(searchColumn?.getFilterValue() as string) ?? ''}
+                onChange={(event) => searchColumn?.setFilterValue(event.target.value)}
                 className="max-w-sm"
             />
             <DropdownMenu>

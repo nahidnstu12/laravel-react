@@ -12,34 +12,27 @@ import { DrawerContainer } from './drawer';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Teachers',
-        href: '/teachers',
+        title: 'Levels',
+        href: '/levels',
     },
 ];
 
-export type Teacher = {
+export type Level = {
     id: string;
-    address: string;
+    name: string;
     status: string;
-    designation: string;
-    pds_id: string;
-    joining_date: Date;
-    location: string;
-    user: {
-        id: number;
-        name: string;
-        email: string;
-    };
     institution: {
         id: number;
         name: string;
     };
 };
 
-function TeacherList({ teachers, institutions }: { teachers: Teacher[], institutions: Institution[] }) {
+function LevelList({ levels, institutions }: { levels: Level[]; institutions: Institution[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
-    const columns: ColumnDef<Teacher>[] = [
+    console.log('levels>>', levels);
+
+    const columns: ColumnDef<Level>[] = [
         {
             id: 'select',
             header: ({ table }) => (
@@ -56,60 +49,24 @@ function TeacherList({ teachers, institutions }: { teachers: Teacher[], institut
             enableHiding: false,
         },
 
-        
         {
-            accessorFn: (row) => row.user.name,
-            id: 'user.name',
-            header: () => <div className="text-right">User Name</div>,
+            accessorKey: 'name',
+            header: () => <div className="text-right">Name</div>,
             cell: ({ row }) => {
-                const username = row.original.user.name;
-                return <div className="text-right font-medium">{username}</div>;
+                const name = row.getValue('name') as string;
+                return <div className="text-right font-medium">{name}</div>;
             },
         },
         {
-            accessorFn: (row) => row.user.email,
-            id: 'user.email',
-            header: () => <div className="text-right">User Email</div>,
-            cell: ({ row }) => {
-                const email = row.original.user.email;
-                return <div className="text-right font-medium">{email}</div>;
-            },
-        },
-        {
-            accessorFn: (row) => row.institution.name,
+            accessorFn: (row) => row.institution?.name,
             id: 'institution.name',
             header: () => <div className="text-right">Institution</div>,
             cell: ({ row }) => {
-                const institution = row.original.institution.name;
-                return <div className="text-right font-medium">{institution}</div>;
+                const institution = row.original.institution?.name;
+                return <div className="text-right font-medium">{institution || 'N/A'}</div>;
             },
         },
-        {
-            accessorKey: 'pds_id',
-            header: () => <div className="text-right">PDS ID</div>,
-            cell: ({ row }) => {
-                const pds_id = row.getValue('pds_id') as string;
-                return <div className="text-right font-medium">{pds_id}</div>;
-            },
-        },
-
-        {
-            accessorKey: 'designation',
-            header: () => <div className="text-right">Designation</div>,
-            cell: ({ row }) => {
-                const designation = row.getValue('designation') as string;
-                return <div className="text-right font-medium">{designation}</div>;
-            },
-        },
-        
-        {
-            accessorKey: 'address',
-            header: () => <div className="text-right">Address</div>,
-            cell: ({ row }) => {
-                const address = row.getValue('address') as string;
-                return <div className="text-right font-medium">{address}</div>;
-            },
-        },
+       
         {
             accessorKey: 'status',
             header: () => <div className="text-right">Status</div>,
@@ -132,11 +89,11 @@ function TeacherList({ teachers, institutions }: { teachers: Teacher[], institut
                             <Pencil />{' '}
                         </Button>
                         <ConfirmationDialog
-                            title="Delete Teacher"
-                            description="Are you sure you want to delete this teacher?"
+                            title="Delete Level"
+                            description="Are you sure you want to delete this level?"
                             deleteText="Delete"
                             cancelText="Cancel"
-                            route={route('teachers.destroy', row.original.id)}
+                            route={route('levels.destroy', row.original.id)}
                         >
                             <Button variant="outline">
                                 <Trash />{' '}
@@ -151,12 +108,12 @@ function TeacherList({ teachers, institutions }: { teachers: Teacher[], institut
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto my-10 w-full">
-                <h1 className="mb-4 text-center text-2xl font-bold">Teachers List</h1>
-                <DataTable columns={columns} data={teachers} openDrawer={openDrawer} title="Teacher" />
+                <h1 className="mb-4 text-center text-2xl font-bold">Levels List</h1>
+                <DataTable columns={columns} data={levels} openDrawer={openDrawer} title="Level" />
             </div>
-            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} options={{institutions}} />
+            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} options={{ institutions }} />
         </AppLayout>
     );
 }
 
-export default TeacherList;
+export default LevelList;
