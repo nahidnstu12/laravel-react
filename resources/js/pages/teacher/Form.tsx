@@ -11,8 +11,18 @@ interface FormProps {
     options: Record<string, any[]>;
 }
 
+// Define fields that should be disabled in edit mode
+// const EDIT_MODE_DISABLED_FIELDS = ['user_email', 'user_name'];
+
 export default function Form({ data, setData, errors, mode, options }: FormProps) {
     const isReadOnly = mode === 'read';
+    const isEditMode = mode === 'edit';
+
+    // Combine mode-specific disabled fields with custom disabled fields
+    // const getDisabledFields = (fieldName: string) => {
+    //     if (isReadOnly) return true;
+    //     if (isEditMode && EDIT_MODE_DISABLED_FIELDS.includes(fieldName)) return true;
+    // };
 
     return (
         <div className="space-y-4">
@@ -31,7 +41,7 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
                 value={data.user_email}
                 onChange={(e) => setData('user_email', e.target.value)}
                 errors={errors}
-                disabled={isReadOnly}
+                disabled={isReadOnly || isEditMode}
             />
             <FormSelect
                 label="Institution"
@@ -40,6 +50,7 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
                 onChange={(value) => setData('institution_id', value)}
                 errors={errors}
                 options={options.institutions}
+                disabled={isReadOnly}
             />
             {/* <FormInput
                 label="Phone"
@@ -86,6 +97,7 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
                 onChange={(date) => setData('joining_date', date)}
                 errors={errors}
                 name="joining_date"
+                disabled={isReadOnly}
             />
 
             <FormInput

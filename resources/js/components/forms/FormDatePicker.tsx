@@ -27,7 +27,6 @@ export default function FormDatePicker({ label, value, onChange, errors, disable
 
     const handleSelect = (date: Date | undefined) => {
         onChange(date);
-
         setOpen(false);
     };
 
@@ -62,7 +61,14 @@ export default function FormDatePicker({ label, value, onChange, errors, disable
 
                 {open && (
                     <div className="bg-popover absolute z-50 mt-1 w-auto rounded-md border p-4 shadow-md">
-                        <Calendar mode="single" selected={value} onSelect={handleSelect} disabled={false} initialFocus />
+                        <Calendar
+                            mode="single"
+                            selected={value}
+                            onSelect={handleSelect}
+                            disabled={disabled}
+                            // fromYear={2020}
+                            // toYear={2030}
+                        />
                     </div>
                 )}
             </div>

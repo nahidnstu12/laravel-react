@@ -95,8 +95,8 @@ class InstitutionController extends Controller
     public function destroy($id)
     {
         $institution = Institution::findOrFail($id);
-        $institution->delete();
-        return redirect()->back()->with('success', 'Institution deleted successfully!');
+        $institution->user->delete();
+        return redirect()->back()->with('success', 'Institution and associated user deleted successfully!');
     }
 
 

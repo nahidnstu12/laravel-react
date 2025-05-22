@@ -18,6 +18,13 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
+    // Handle 401 responses by redirecting to login
+    // handleError: (error) => {
+    //     if (error.response?.status === 401) {
+    //         window.location.href = '/login';
+    //     }
+    //     return error;
+    // },
 });
 
 // This will set light / dark mode on load...
