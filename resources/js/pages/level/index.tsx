@@ -1,14 +1,15 @@
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import DataTable from '@/components/datatable';
+import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
+import { DrawerContainer } from '@/components/shared/drawer-container';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import useDrawer from '@/hooks/useDrawer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+import { Institution, Level } from '@/types/feature-types';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
-import { Institution } from '../institution';
-import { DrawerContainer } from './drawer';
+import Form from './Form';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,20 +18,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export type Level = {
-    id: string;
-    name: string;
-    status: string;
-    institution: {
-        id: number;
-        name: string;
-    };
-};
-
 function LevelList({ levels, institutions }: { levels: Level[]; institutions: Institution[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
-
-    console.log('levels>>', levels);
 
     const columns: ColumnDef<Level>[] = [
         {
@@ -66,7 +55,7 @@ function LevelList({ levels, institutions }: { levels: Level[]; institutions: In
                 return <div className="text-right font-medium">{institution || 'N/A'}</div>;
             },
         },
-       
+
         {
             accessorKey: 'status',
             header: () => <div className="text-right">Status</div>,
@@ -111,7 +100,27 @@ function LevelList({ levels, institutions }: { levels: Level[]; institutions: In
                 <h1 className="mb-4 text-center text-2xl font-bold">Levels List</h1>
                 <DataTable columns={columns} data={levels} openDrawer={openDrawer} title="Level" />
             </div>
-            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} options={{ institutions }} />
+            <DrawerContainer
+                drawerSettings={{ isOpen, onClose: closeDrawer, mode, itemId }}
+                formSettings={{
+                    initialData: {
+                        name: '',
+                        status: false,
+                        institution_id: '',
+                    },
+                    postRoute: 'levels.store',
+                    updateRoute: 'levels.update',
+                    showRoute: 'levels.show',
+                    transformResponse: (data) => ({
+                        name: data.name || '',
+                        status: data.status || false,
+                        institution_id: data.institution_id || '',
+                    }),
+                }}
+                featureTitle="Level"
+            >
+                {({ data, setData, errors, mode }) => <Form data={data} setData={setData} errors={errors} mode={mode} options={{ institutions }} />}
+            </DrawerContainer>
         </AppLayout>
     );
 }

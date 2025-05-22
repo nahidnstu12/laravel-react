@@ -1,4 +1,4 @@
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
+import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
 import DataTable from '@/components/datatable';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -7,9 +7,9 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
-import { Institution } from '../institution';
-import { Level } from '../level';
-import { DrawerContainer } from './drawer';
+import { Level, Institution, Subject } from '@/types/feature-types';
+import { DrawerContainer } from '@/components/shared/drawer-container';
+import Form from './Form';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,21 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export type Subject = {
-    id: string;
-    name: string;
-    status: string;
-    level_id: string;
-    institution_id: string;
-    level: {
-        id: number;
-        name: string;
-    };
-    institution: {
-        id: number;
-        name: string;
-    };
-};
+
 
 function SubjectList({ subjects, institutions, levels }: { subjects: Subject[]; institutions: Institution[]; levels: Level[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
@@ -123,7 +109,31 @@ function SubjectList({ subjects, institutions, levels }: { subjects: Subject[]; 
                 <h1 className="mb-4 text-center text-2xl font-bold">Subjects List</h1>
                 <DataTable columns={columns} data={subjects} openDrawer={openDrawer} title="Subject" />
             </div>
-            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} options={{ institutions, levels }} />
+            <DrawerContainer
+                drawerSettings={{ isOpen, onClose: closeDrawer, mode, itemId }}
+                formSettings={{
+                    initialData: {
+                        name: '',
+                        description: '',
+                        status: false,
+                        institution_id: '',
+                        level_id: '',
+                    },
+                    postRoute: 'subjects.store',
+                    updateRoute: 'subjects.update',
+                    showRoute: 'subjects.show',
+                    transformResponse: (data) => ({
+                        name: data.name || '',
+                        description: data.description || '',
+                        status: data.status || false,
+                        institution_id: data.institution_id || '',
+                        level_id: data.level_id || '',
+                    }),
+                }}
+                featureTitle="Subject"  
+            >
+                {({ data, setData, errors, mode }) => <Form data={data} setData={setData} errors={errors} mode={mode} options={{ institutions, levels }} />}
+            </DrawerContainer>
         </AppLayout>
     );
 }

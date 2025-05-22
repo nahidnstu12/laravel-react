@@ -2,8 +2,8 @@ import FormInput from '@/components/forms/FormInput';
 import { FormSelect } from '@/components/forms/FormSelect';
 import FormSwitch from '@/components/forms/FormSwitch';
 import FormTextarea from '@/components/forms/FormTextarea';
-import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 interface FormProps {
     data: Record<string, any>;
@@ -30,6 +30,7 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
 
     // Handle institution change
     const handleInstitutionChange = (value: string) => {
+        console.log("value", value);
         setData('institution_id', value);
         setData('level_id', ''); // Clear level selection
         if (value) {
@@ -45,6 +46,11 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
             fetchLevels(data.institution_id);
         }
     }, []);
+
+  
+
+    console.log("level data", data, levels);
+    
 
     return (
         <div className="space-y-4">

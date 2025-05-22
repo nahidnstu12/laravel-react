@@ -1,4 +1,4 @@
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
+import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
 import DataTable from '@/components/datatable';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -7,8 +7,8 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
-import { Institution } from '../institution';
 import { DrawerContainer } from './drawer';
+import { Institution, Teacher } from '@/types/feature-types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,24 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export type Teacher = {
-    id: string;
-    address: string;
-    status: string;
-    designation: string;
-    pds_id: string;
-    joining_date: Date;
-    location: string;
-    user: {
-        id: number;
-        name: string;
-        email: string;
-    };
-    institution: {
-        id: number;
-        name: string;
-    };
-};
+
 
 function TeacherList({ teachers, institutions }: { teachers: Teacher[], institutions: Institution[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();

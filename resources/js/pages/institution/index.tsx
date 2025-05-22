@@ -1,4 +1,4 @@
-import { ConfirmationDialog } from '@/components/ConfirmationDialog';
+import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
 import DataTable from '@/components/datatable';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -7,7 +7,9 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Eye, Pencil, Trash } from 'lucide-react';
-import { DrawerContainer } from './drawer';
+import { Institution } from '@/types/feature-types';
+import { DrawerContainer } from '@/components/shared/drawer-container';
+import Form from './Form';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -15,26 +17,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/institutions',
     },
 ];
-
-export type Institution = {
-    id: string;
-    name: string;
-    registration_no: string;
-    no_of_students: number;
-    no_of_teachers: number;
-    type: string;
-    cover_photo: string;
-    logo: string;
-    location: string;
-    user: {
-        id: number;
-        name: string;
-        email: string;
-        email_verified_at: string | null;
-        created_at: string;
-        updated_at: string;
-    };
-};
 
 function InstitutionList({ institutions }: { institutions: Institution[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
@@ -157,7 +139,54 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
                 <h1 className="mb-4 text-center text-2xl font-bold">Institutions List</h1>
                 <DataTable columns={columns} data={institutions} openDrawer={openDrawer} title="Institution" />
             </div>
-            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} />
+            <DrawerContainer 
+                drawerSettings={{ isOpen, onClose: closeDrawer, mode, itemId }}
+                formSettings={{ 
+                    initialData: {
+                        user_name: '',
+                        name: '',
+                        registration_no: '',
+                        no_of_students: '',
+                        no_of_teachers: '',
+                        type: 'primary',
+                        cover_photo: '',
+                        logo: '',
+                        location: '',
+                        status: true as const,
+                        limit: '',
+                        extra_infos: '',
+                        user_email: '',
+                    }, 
+                    postRoute: 'institutions.store', 
+                    updateRoute: 'institutions.update', 
+                    showRoute: 'institutions.show',
+                    transformResponse: (data) => ({
+                        user_name: data.user?.name || '',
+                        name: data.name || '',
+                        registration_no: data.registration_no || '',
+                        no_of_students: data.no_of_students || '',
+                        no_of_teachers: data.no_of_teachers || '',
+                        type: data.type || 1,
+                        cover_photo: data.cover_photo || '',
+                        logo: data.logo || '',
+                        location: data.location || '',
+                        status: data.status || true,
+                        limit: data.limit || '',
+                        extra_infos: data.extra_infos || '',
+                        user_email: data.user?.email || '',
+                    })
+                }}  
+                featureTitle="Institution"
+            >
+                {({ data, setData, errors, mode }) => (
+                    <Form 
+                        data={data}
+                        setData={setData}
+                        errors={errors}
+                        mode={mode}
+                    />
+                )}
+            </DrawerContainer>
         </AppLayout>
     );
 }
