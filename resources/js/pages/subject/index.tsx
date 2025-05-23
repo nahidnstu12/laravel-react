@@ -1,14 +1,14 @@
-import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
 import DataTable from '@/components/datatable';
+import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
+import { DrawerContainer } from '@/components/shared/drawer-container';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import useDrawer from '@/hooks/useDrawer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+import { Institution, Level, Subject } from '@/types/feature-types';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
-import { Level, Institution, Subject } from '@/types/feature-types';
-import { DrawerContainer } from '@/components/shared/drawer-container';
 import Form from './Form';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -17,8 +17,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/subjects',
     },
 ];
-
-
 
 function SubjectList({ subjects, institutions, levels }: { subjects: Subject[]; institutions: Institution[]; levels: Level[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
@@ -130,9 +128,9 @@ function SubjectList({ subjects, institutions, levels }: { subjects: Subject[]; 
                         level_id: data.level_id || '',
                     }),
                 }}
-                featureTitle="Subject"  
+                featureTitle="Subject"
             >
-                {({ data, setData, errors, mode }) => <Form data={data} setData={setData} errors={errors} mode={mode} options={{ institutions, levels }} />}
+                {({ data, setData, errors, mode }) => <Form data={data} setData={setData} errors={errors} mode={mode} options={{ institutions }} />}
             </DrawerContainer>
         </AppLayout>
     );

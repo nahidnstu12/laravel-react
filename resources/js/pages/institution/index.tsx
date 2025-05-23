@@ -184,6 +184,7 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
                         setData={setData}
                         errors={errors}
                         mode={mode}
+                        options={{}}
                     />
                 )}
             </DrawerContainer>

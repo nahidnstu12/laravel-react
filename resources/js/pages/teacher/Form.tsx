@@ -2,14 +2,9 @@ import FormDatePicker from '@/components/forms/FormDatePicker';
 import FormInput from '@/components/forms/FormInput';
 import { FormSelect } from '@/components/forms/FormSelect';
 import FormSwitch from '@/components/forms/FormSwitch';
+import { FormProps } from '@/types/shared-types';
 
-interface FormProps {
-    data: Record<string, any>;
-    setData: (key: string, value: any) => void;
-    errors: Record<string, string>;
-    mode: 'create' | 'read' | 'edit' | 'delete';
-    options: Record<string, any[]>;
-}
+
 
 // Define fields that should be disabled in edit mode
 // const EDIT_MODE_DISABLED_FIELDS = ['user_email', 'user_name'];

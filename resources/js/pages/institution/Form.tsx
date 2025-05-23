@@ -2,13 +2,7 @@ import FormInput from '@/components/forms/FormInput';
 import { FormSelect } from '@/components/forms/FormSelect';
 import FormSwitch from '@/components/forms/FormSwitch';
 import FormTextarea from '@/components/forms/FormTextarea';
-
-interface FormProps {
-    data: Record<string, any>;
-    setData: (key: string, value: any) => void;
-    errors: Record<string, string>;
-    mode: 'create' | 'read' | 'edit' | 'delete';
-}
+import { FormProps } from '@/types/shared-types';
 
 export default function Form({ data, setData, errors, mode }: FormProps) {
     const isReadOnly = mode === 'read';

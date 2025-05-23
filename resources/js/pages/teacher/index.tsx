@@ -1,14 +1,15 @@
-import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
 import DataTable from '@/components/datatable';
+import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
+import { DrawerContainer } from '@/components/shared/drawer-container';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import useDrawer from '@/hooks/useDrawer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+import { Institution, Teacher } from '@/types/feature-types';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
-import { DrawerContainer } from './drawer';
-import { Institution, Teacher } from '@/types/feature-types';
+import Form from './Form';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,9 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-
-
-function TeacherList({ teachers, institutions }: { teachers: Teacher[], institutions: Institution[] }) {
+function TeacherList({ teachers, institutions }: { teachers: Teacher[]; institutions: Institution[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
     const columns: ColumnDef<Teacher>[] = [
@@ -39,7 +38,6 @@ function TeacherList({ teachers, institutions }: { teachers: Teacher[], institut
             enableHiding: false,
         },
 
-        
         {
             accessorFn: (row) => row.user.name,
             id: 'user.name',
@@ -84,7 +82,7 @@ function TeacherList({ teachers, institutions }: { teachers: Teacher[], institut
                 return <div className="text-right font-medium">{designation}</div>;
             },
         },
-        
+
         {
             accessorKey: 'address',
             header: () => <div className="text-right">Address</div>,
@@ -137,7 +135,49 @@ function TeacherList({ teachers, institutions }: { teachers: Teacher[], institut
                 <h1 className="mb-4 text-center text-2xl font-bold">Teachers List</h1>
                 <DataTable columns={columns} data={teachers} openDrawer={openDrawer} title="Teacher" />
             </div>
-            <DrawerContainer isOpen={isOpen} onClose={closeDrawer} mode={mode} itemId={itemId} options={{institutions}} />
+            <DrawerContainer
+                drawerSettings={{ isOpen, onClose: closeDrawer, mode, itemId }}
+                formSettings={{
+                    initialData: {
+                        pds_id: '',
+                        designation: '',
+                        address: '',
+                        status: false,
+                        institution_id: '',
+                        district: '',
+                        created_at: '',
+                        updated_at: '',
+                        location: '',
+                        joining_date: '',
+                        user: {
+                            id: '',
+                        },
+                        user_name: '',
+                        user_email: '',
+                    },
+                    postRoute: 'teachers.store',
+                    updateRoute: 'teachers.update',
+                    showRoute: 'teachers.show',
+                    transformResponse: (data) => ({
+                        user_name: data.user?.name || '',
+                        name: data.name || '',
+                        pds_id: data.pds_id || '',
+                        designation: data.designation || '',
+                        address: data.address || '',
+                        status: data.status || true,
+                        institution_id: data.institution_id || '',
+                        district: data.district || '',
+                        created_at: data.created_at || '',
+                        updated_at: data.updated_at || '',
+                        location: data.location || '',
+                        joining_date: data.joining_date || '',
+                        user_email: data.user?.email || '',
+                    }),
+                }}
+                featureTitle="Teacher"
+            >
+                {({ data, setData, errors, mode }) => <Form data={data} setData={setData} errors={errors} mode={mode} options={{ institutions }} />}
+            </DrawerContainer>
         </AppLayout>
     );
 }

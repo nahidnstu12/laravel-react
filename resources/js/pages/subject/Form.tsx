@@ -4,14 +4,7 @@ import FormSwitch from '@/components/forms/FormSwitch';
 import FormTextarea from '@/components/forms/FormTextarea';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-
-interface FormProps {
-    data: Record<string, any>;
-    setData: (key: string, value: any) => void;
-    errors: Record<string, string>;
-    mode: 'create' | 'read' | 'edit' | 'delete';
-    options: Record<string, any[]>;
-}
+import { FormProps } from '@/types/shared-types';
 
 export default function Form({ data, setData, errors, mode, options }: FormProps) {
     const isReadOnly = mode === 'read';
@@ -21,7 +14,8 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
     const fetchLevels = async (institutionId: string | number) => {
         try {
             const response = await axios.get(route('api.institutions.levels', institutionId));
-            setLevels(response.data);
+            console.log('response levels>>', response.data, institutionId);
+            setLevels(response.data.map((level: any) => ({ ...level, id: level.id.toString() })));
         } catch (error) {
             console.error('Error fetching levels:', error);
             setLevels([]);
@@ -30,9 +24,10 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
 
     // Handle institution change
     const handleInstitutionChange = (value: string) => {
-        console.log("value", value);
         setData('institution_id', value);
-        setData('level_id', ''); // Clear level selection
+        setData('level_id', data.level_id.toString());
+        console.log('value', value, data.level_id);
+        // setData('level_id', ''); // Clear level selection
         if (value) {
             fetchLevels(value);
         } else {
@@ -43,14 +38,11 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
     // Initial fetch of levels if institution is selected
     useEffect(() => {
         if (data.institution_id) {
-            fetchLevels(data.institution_id);
+            fetchLevels(data.institution_id); // Clear level selection``
         }
     }, []);
 
-  
-
-    console.log("level data", data, levels);
-    
+    console.log('level data', data, levels);
 
     return (
         <div className="space-y-4">
