@@ -17,7 +17,8 @@ class Level extends Model
     'status'
   ];
 
-  public function institution(): BelongsTo {
+  public function institution(): BelongsTo
+  {
     return $this->belongsTo(Institution::class);
   }
 
@@ -33,11 +34,13 @@ class Level extends Model
   //   return $this->hasMany(Shift::class);
   // }
 
-  public function subjects(): HasMany {
+  public function subjects(): HasMany
+  {
     return $this->hasMany(Subject::class);
   }
 
-  public function teachers(): BelongsToMany {
+  public function teachers(): BelongsToMany
+  {
     return $this->belongsToMany(Teacher::class);
   }
 
