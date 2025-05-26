@@ -21,6 +21,26 @@ const breadcrumbs: BreadcrumbItem[] = [
 function SubjectList({ subjects, institutions, levels }: { subjects: Subject[]; institutions: Institution[]; levels: Level[] }) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
+    const filterOptions = {
+        name: {
+            type: 'input' as const,
+        },
+        'institution.name': {
+            type: 'select' as const,
+            options: institutions.map((institution) => ({
+                label: institution.name,
+                value: institution.id.toString(),
+            })),
+        },
+        level: {
+            type: 'select' as const,
+            options: levels.map((level) => ({
+                label: level.name,
+                value: level.id.toString(),
+            })),
+        },
+    };
+
     const columns: ColumnDef<Subject>[] = [
         {
             id: 'select',
@@ -105,7 +125,7 @@ function SubjectList({ subjects, institutions, levels }: { subjects: Subject[]; 
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto my-10 w-full">
                 <h1 className="mb-4 text-center text-2xl font-bold">Subjects List</h1>
-                <DataTable columns={columns} data={subjects} openDrawer={openDrawer} title="Subject" />
+                <DataTable columns={columns} data={subjects} openDrawer={openDrawer} title="Subject" filterOptions={filterOptions} />
             </div>
             <DrawerContainer
                 drawerSettings={{ isOpen, onClose: closeDrawer, mode, itemId }}

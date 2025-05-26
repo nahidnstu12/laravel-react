@@ -1,31 +1,27 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import { DrawerMode } from '@/hooks/useDrawer';
-import { Column, Table } from '@tanstack/react-table';
+import { Table } from '@tanstack/react-table';
 import { ChevronDown, Plus } from 'lucide-react';
+import FilterModal from './FilterModal';
+
 interface TopContentProps<T> {
     table: Table<T>;
     openDrawer: (mode: DrawerMode, id?: string) => void;
     title: string;
+    filterOptions?: {
+        [key: string]: {
+            type: 'input' | 'select';
+            options?: { label: string; value: string }[];
+            fetchOptions?: () => Promise<{ label: string; value: string }[]>;
+        };
+    };
 }
 
-export default function TopContent<T>({ table, openDrawer, title }: TopContentProps<T>) {
-    // Get the first text-based column for search
-    const searchColumn = table.getAllColumns().find(column => 
-        column.id !== 'select' && 
-        column.id !== 'actions' && 
-        typeof table.getRowModel().rows[0]?.getValue(column.id) === 'string'
-    );
-
+export default function TopContent<T>({ table, openDrawer, title, filterOptions }: TopContentProps<T>) {
     return (
         <div className="flex items-center py-4">
-            <Input
-                placeholder={`Filter ${searchColumn?.id || ''}...`}
-                value={(searchColumn?.getFilterValue() as string) ?? ''}
-                onChange={(event) => searchColumn?.setFilterValue(event.target.value)}
-                className="max-w-sm"
-            />
+            <FilterModal table={table} filterOptions={filterOptions} />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="ml-auto">
@@ -35,8 +31,8 @@ export default function TopContent<T>({ table, openDrawer, title }: TopContentPr
                 <DropdownMenuContent align="end">
                     {table
                         .getAllColumns()
-                        .filter((column: Column<T>) => column.getCanHide())
-                        .map((column: Column<T>) => {
+                        .filter((column) => column.getCanHide())
+                        .map((column) => {
                             return (
                                 <DropdownMenuCheckboxItem
                                     key={column.id}

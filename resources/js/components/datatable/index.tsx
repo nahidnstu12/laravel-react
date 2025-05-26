@@ -12,19 +12,26 @@ import {
 } from '@tanstack/react-table';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DrawerMode } from '@/hooks/useDrawer';
 import { useState } from 'react';
 import BottomContent from './BottomContent';
 import TopContent from './TopContent';
-import { DrawerMode } from '@/hooks/useDrawer';
 
 interface DataTableProps<T> {
     columns: ColumnDef<T>[];
     data: T[];
     openDrawer: (mode: DrawerMode, id?: string) => void;
     title: string;
+    filterOptions?: {
+        [key: string]: {
+            type: 'input' | 'select';
+            options?: { label: string; value: string }[];
+            fetchOptions?: () => Promise<{ label: string; value: string }[]>;
+        };
+    };
 }
 
-export default function DataTable<T>({ columns, data, openDrawer, title }: DataTableProps<T>) {
+export default function DataTable<T>({ columns, data, openDrawer, title, filterOptions }: DataTableProps<T>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -50,7 +57,7 @@ export default function DataTable<T>({ columns, data, openDrawer, title }: DataT
     });
     return (
         <>
-            <TopContent table={table} openDrawer={openDrawer} title={title} />
+            <TopContent table={table} openDrawer={openDrawer} title={title} filterOptions={filterOptions} />
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
