@@ -14,8 +14,7 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
     const fetchLevels = async (institutionId: string | number) => {
         try {
             const response = await axios.get(route('api.institutions.levels', institutionId));
-            console.log('response levels>>', response.data, institutionId);
-            setLevels(response.data.map((level: any) => ({ ...level, id: level.id.toString() })));
+            setLevels(response.data);
         } catch (error) {
             console.error('Error fetching levels:', error);
             setLevels([]);
@@ -25,9 +24,7 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
     // Handle institution change
     const handleInstitutionChange = (value: string) => {
         setData('institution_id', value);
-        setData('level_id', data.level_id.toString());
-        console.log('value', value, data.level_id);
-        // setData('level_id', ''); // Clear level selection
+        setData('level_id', ''); // Clear level selection
         if (value) {
             fetchLevels(value);
         } else {
@@ -39,8 +36,9 @@ export default function Form({ data, setData, errors, mode, options }: FormProps
     useEffect(() => {
         if (data.institution_id) {
             fetchLevels(data.institution_id); // Clear level selection``
+            setData('level_id', data.level_id.toString());
         }
-    }, []);
+    }, [data.institution_id]);
 
     console.log('level data', data, levels);
 
