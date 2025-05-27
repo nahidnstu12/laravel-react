@@ -98,7 +98,13 @@ function LevelList({ levels, institutions }: { levels: Level[]; institutions: In
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto my-10 w-full">
                 <h1 className="mb-4 text-center text-2xl font-bold">Levels List</h1>
-                <DataTable columns={columns} data={levels} openDrawer={openDrawer} title="Level" />
+                <DataTable columns={columns}
+                    data={levels}
+                    openDrawer={openDrawer}
+                    title="Level"
+                    routeName="levels.index"
+                    paginationMeta={{ current_page: levels.current_page, last_page: levels.last_page, per_page: levels.per_page }}
+                />
             </div>
             <DrawerContainer
                 drawerSettings={{ isOpen, onClose: closeDrawer, mode, itemId }}

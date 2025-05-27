@@ -15,11 +15,48 @@ use Inertia\Inertia;
 
 class TeacherController extends Controller
 {
-  public function index()
+  public function index(Request $request)
   {
-    $teachers = Teacher::with('institution', 'user')->get();
+    $query = Teacher::with('institution', 'user');
+
+    if ($request->has('name')) {
+      $name = $request->name;
+      $query->where('name', 'like', "%{$name}%");
+    }
+
+    if ($request->has('status')) {
+      $query->where('status', $request->status);
+    }
+
+    if ($request->has('institution_id')) {
+      $query->where('institution_id', $request->institution_id);
+    }
+
+    if ($request->has('pds_id')) {
+      $query->where('pds_id', $request->pds_id);
+    }
+
+    if ($request->has('designation')) {
+      $query->where('designation', $request->designation);
+    }
+
+    if ($request->has('joining_date')) {
+      $query->where('joining_date', $request->joining_date);
+    }
+
+    $sortField = $request->sort_field ?? 'created_at';
+    $sortDirection = $request->sort_direction ?? 'desc';
+    $query->orderBy($sortField, $sortDirection);
+
+    $perPage = $request->per_page ?? 10;
+    $teachers = $query->paginate($perPage);
+
     $institutions = Institution::all();
-    return Inertia::render('teacher/index', compact('teachers', 'institutions'));
+    return Inertia::render('teacher/index', [
+      'teachers' => $teachers,
+      'institutions' => $institutions,
+      'filters' => $request->only(['name', 'status', 'institution_id', 'sort_field', 'sort_direction', 'per_page']),
+    ]);
   }
 
   public function store(Request $request)

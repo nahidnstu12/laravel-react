@@ -11,12 +11,42 @@ use Inertia\Inertia;
 
 class SubjectController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::with('institution', 'level')->get();
+        $query = Subject::with('institution', 'level');
+
+        if ($request->has('name')) {
+            $name = $request->name;
+            $query->where('name', 'like', "%{$name}%");
+        }
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('institution_id')) {
+            $query->where('institution_id', $request->institution_id);
+        }
+
+        if ($request->has('level_id')) {
+            $query->where('level_id', $request->level_id);
+        }
+
+        $sortField = $request->sort_field ?? 'created_at';
+        $sortDirection = $request->sort_direction ?? 'desc';
+        $query->orderBy($sortField, $sortDirection);
+
+        $perPage = $request->per_page ?? 10;
+        $subjects = $query->paginate($perPage);
+
         $institutions = Institution::all();
         $levels = Level::all();
-        return Inertia::render('subject/index', compact('subjects', 'institutions', 'levels'));
+        return Inertia::render('subject/index', [
+            'subjects' => $subjects,
+            'institutions' => $institutions,
+            'levels' => $levels,
+            'filters' => $request->only(['name', 'status', 'institution_id', 'level_id', 'sort_field', 'sort_direction', 'per_page']),
+        ]);
     }
 
     public function store(Request $request)
