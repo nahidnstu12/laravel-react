@@ -1,14 +1,14 @@
-import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
 import DataTable from '@/components/datatable';
+import { ConfirmationDialog } from '@/components/shared/ConfirmationDialog';
+import { DrawerContainer } from '@/components/shared/drawer-container';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import useDrawer from '@/hooks/useDrawer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Eye, Pencil, Trash } from 'lucide-react';
 import { Institution } from '@/types/feature-types';
-import { DrawerContainer } from '@/components/shared/drawer-container';
+import { ColumnDef } from '@tanstack/react-table';
+import { Eye, Pencil, Trash } from 'lucide-react';
 import Form from './Form';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -18,7 +18,29 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-function InstitutionList({ institutions }: { institutions: Institution[] }) {
+interface InstitutionListProps {
+    institutions: {
+        data: Institution[];
+        current_page: number;
+        from: number;
+        last_page: number;
+        per_page: number;
+        to: number;
+        total: number;
+    };
+    filters: {
+        search?: string;
+        name?: string;
+        registration_no?: string;
+        type?: string;
+        status?: boolean;
+        sort_field?: string;
+        sort_direction?: 'asc' | 'desc';
+        per_page?: number;
+    };
+}
+
+function InstitutionList({ institutions, filters }: InstitutionListProps) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
     const columns: ColumnDef<Institution>[] = [
@@ -37,75 +59,90 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
             enableSorting: false,
             enableHiding: false,
         },
-
         {
             accessorKey: 'name',
-            header: ({ column }) => {
-                return (
-                    <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                        Name
-                        <ArrowUpDown />
-                    </Button>
-                );
-            },
+            // header: ({ column }) => {
+            //     return (
+            //         <Button
+            //             variant="ghost"
+            //             onClick={() => {
+            //                 const direction = column.getIsSorted() === 'asc' ? 'desc' : 'asc';
+            //                 handleSortingChange('name', direction);
+            //             }}
+            //         >
+            //             Name
+            //             <ArrowUpDown className="ml-2 h-4 w-4" />
+            //         </Button>
+            //     );
+            // },
+            header: () => <div className="text-center">Name</div>,
             cell: ({ row }) => <div className="lowercase">{row.getValue('name')}</div>,
         },
         {
             accessorFn: (row) => row.user.name,
             id: 'user.name',
-            header: () => <div className="text-right">User Name</div>,
+            header: () => <div className="text-center">User Name</div>,
             cell: ({ row }) => {
                 const username = row.original.user.name;
-                return <div className="text-right font-medium">{username}</div>;
+                return <div className="text-center font-medium">{username}</div>;
             },
+            enableSorting: false,
         },
         {
             accessorFn: (row) => row.user.email,
             id: 'user.email',
-            header: () => <div className="text-right">User Email</div>,
+            header: () => <div className="text-center">User Email</div>,
             cell: ({ row }) => {
                 const email = row.original.user.email;
-                return <div className="text-right font-medium">{email}</div>;
+                return <div className="text-center font-medium">{email}</div>;
             },
+            filterFn: (row, id, filterValue) => {
+                return row.original.user.email.toLowerCase().includes(filterValue.toLowerCase());
+            },
+            enableSorting: false,
         },
         {
             accessorKey: 'registration_no',
-            header: () => <div className="text-right">Registration No</div>,
+            header: () => <div className="text-center">Registration No</div>,
             cell: ({ row }) => {
                 const registration_no = row.getValue('registration_no') as string;
-                return <div className="text-right font-medium">{registration_no}</div>;
+                return <div className="text-center font-medium">{registration_no}</div>;
             },
+            enableSorting: false,
         },
-
         {
             accessorKey: 'no_of_students',
-            header: () => <div className="text-right">No of Students</div>,
+            enableSorting: true,
+            header: () => <div className="text-center">No of Students</div>,
             cell: ({ row }) => {
                 const no_of_students = row.getValue('no_of_students') as number;
-                return <div className="text-right font-medium">{no_of_students}</div>;
+                return <div className="text-center font-medium">{no_of_students}</div>;
             },
         },
         {
             accessorKey: 'no_of_teachers',
-            header: () => <div className="text-right">No of Teachers</div>,
+            header: () => <div className="text-center">No of Teachers</div>,
             cell: ({ row }) => {
                 const no_of_teachers = row.getValue('no_of_teachers') as number;
-                return <div className="text-right font-medium">{no_of_teachers}</div>;
+                return <div className="text-center font-medium">{no_of_teachers}</div>;
             },
         },
         {
             accessorKey: 'type',
-            header: () => <div className="text-right">Type</div>,
+            header: () => <div className="text-center">Type</div>,
             cell: ({ row }) => {
                 const type = Number(row.getValue('type'));
 
-                return <div className="text-right font-medium">{type === 3 ? 'Collage' : type === 2 ? 'Secondary' : 'Primary'}</div>;
+                return <div className="text-center font-medium">{type === 3 ? 'Collage' : type === 2 ? 'Secondary' : 'Primary'}</div>;
+            },
+            filterFn: (row, id, filterValue) => {
+                return row.original.type.toLowerCase().includes(filterValue.toLowerCase());
             },
         },
-
         {
             id: 'actions',
             enableHiding: false,
+            enableSorting: false,
             header: () => <div className="text-center">Actions</div>,
             cell: ({ row }) => {
                 return (
@@ -137,11 +174,19 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto my-10 w-full">
                 <h1 className="mb-4 text-center text-2xl font-bold">Institutions List</h1>
-                <DataTable columns={columns} data={institutions} openDrawer={openDrawer} title="Institution" />
+                <DataTable
+                    columns={columns}
+                    data={institutions.data}
+                    openDrawer={openDrawer}
+                    title="Institution"
+                    filters={filters}
+                    routeName={route('institutions.index')}
+                    paginationMeta={{ current_page: institutions.current_page, last_page: institutions.last_page, per_page: institutions.per_page }}
+                />
             </div>
-            <DrawerContainer 
+            <DrawerContainer
                 drawerSettings={{ isOpen, onClose: closeDrawer, mode, itemId }}
-                formSettings={{ 
+                formSettings={{
                     initialData: {
                         user_name: '',
                         name: '',
@@ -156,9 +201,9 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
                         limit: '',
                         extra_infos: '',
                         user_email: '',
-                    }, 
-                    postRoute: 'institutions.store', 
-                    updateRoute: 'institutions.update', 
+                    },
+                    postRoute: 'institutions.store',
+                    updateRoute: 'institutions.update',
                     showRoute: 'institutions.show',
                     transformResponse: (data) => ({
                         user_name: data.user?.name || '',
@@ -174,19 +219,11 @@ function InstitutionList({ institutions }: { institutions: Institution[] }) {
                         limit: data.limit || '',
                         extra_infos: data.extra_infos || '',
                         user_email: data.user?.email || '',
-                    })
-                }}  
+                    }),
+                }}
                 featureTitle="Institution"
             >
-                {({ data, setData, errors, mode }) => (
-                    <Form 
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        mode={mode}
-                        options={{}}
-                    />
-                )}
+                {({ data, setData, errors, mode }) => <Form data={data} setData={setData} errors={errors} mode={mode} options={{}} />}
             </DrawerContainer>
         </AppLayout>
     );

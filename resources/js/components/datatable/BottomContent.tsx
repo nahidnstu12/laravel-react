@@ -1,38 +1,53 @@
-import React from 'react'
-import { Button } from '@/components/ui/button'
-import { Table } from '@tanstack/react-table'
+import { router } from '@inertiajs/react';
+import { Pagination } from '../ui/pagination';
 
 interface BottomContentProps<T> {
-    table: Table<T>;
+    filters: Record<string, any>;
+    paginationMeta: {
+        current_page: number;
+        last_page: number;
+        per_page: number;
+    };
+    routeName: string;
 }
 
-export default function BottomContent<T>({ table }: BottomContentProps<T>) {
-    
-  return (
-    <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+export default function BottomContent<T>({ filters, paginationMeta, routeName }: BottomContentProps<T>) {
+    const handlePageChange = (page: number) => {
+        router.get(
+            routeName,
+            {
+                ...filters,
+                page,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
 
-  )
+    const handlePageSizeChange = (size: number) => {
+        router.get(
+            routeName,
+            {
+                ...filters,
+                per_page: size,
+                page: 1,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
+    return (
+        <Pagination
+            currentPage={paginationMeta.current_page}
+            totalPages={paginationMeta.last_page}
+            pageSize={paginationMeta.per_page}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+        />
+    );
 }
