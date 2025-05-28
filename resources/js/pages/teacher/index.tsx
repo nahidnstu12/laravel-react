@@ -18,7 +18,28 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-function TeacherList({ teachers, institutions }: { teachers: Teacher[]; institutions: Institution[] }) {
+interface TeacherListProps {
+    teachers: {
+        data: Teacher[];
+        current_page: number;
+        from: number;
+        last_page: number;
+        per_page: number;
+        to: number;
+        total: number;
+    };
+    filters: {
+        name?: string;
+        institution_id?: string;
+        status?: boolean;
+        sort_field?: string;
+        sort_direction?: 'asc' | 'desc';
+        per_page?: number;
+    };
+    institutions: Institution[];
+}
+
+function TeacherList({ teachers, institutions, filters }: TeacherListProps) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
     const columns: ColumnDef<Teacher>[] = [
@@ -41,62 +62,70 @@ function TeacherList({ teachers, institutions }: { teachers: Teacher[]; institut
         {
             accessorFn: (row) => row.user.name,
             id: 'user.name',
-            header: () => <div className="text-right">User Name</div>,
+            header: () => <div className="text-center">User Name</div>,
             cell: ({ row }) => {
                 const username = row.original.user.name;
-                return <div className="text-right font-medium">{username}</div>;
+                return <div className="text-center font-medium">{username}</div>;
             },
         },
         {
             accessorFn: (row) => row.user.email,
             id: 'user.email',
-            header: () => <div className="text-right">User Email</div>,
+            header: () => <div className="text-center">User Email</div>,
             cell: ({ row }) => {
                 const email = row.original.user.email;
-                return <div className="text-right font-medium">{email}</div>;
+                return <div className="text-center font-medium">{email}</div>;
             },
         },
         {
             accessorFn: (row) => row.institution.name,
             id: 'institution.name',
-            header: () => <div className="text-right">Institution</div>,
+            header: () => <div className="text-center">Institution</div>,
             cell: ({ row }) => {
                 const institution = row.original.institution.name;
-                return <div className="text-right font-medium">{institution}</div>;
+                return <div className="text-center font-medium">{institution}</div>;
             },
         },
         {
             accessorKey: 'pds_id',
-            header: () => <div className="text-right">PDS ID</div>,
+            header: () => <div className="text-center">PDS ID</div>,
             cell: ({ row }) => {
                 const pds_id = row.getValue('pds_id') as string;
-                return <div className="text-right font-medium">{pds_id}</div>;
+                return <div className="text-center font-medium">{pds_id}</div>;
             },
         },
 
         {
             accessorKey: 'designation',
-            header: () => <div className="text-right">Designation</div>,
+            header: () => <div className="text-center">Designation</div>,
             cell: ({ row }) => {
                 const designation = row.getValue('designation') as string;
-                return <div className="text-right font-medium">{designation}</div>;
+                return <div className="text-center font-medium">{designation}</div>;
+            },
+        },
+        {
+            accessorKey: 'joining_date',
+            header: () => <div className="text-center">Joining Date</div>,
+            cell: ({ row }) => {
+                const joining_date = row.getValue('joining_date') as string;
+                return <div className="text-center font-medium">{joining_date}</div>;
             },
         },
 
         {
             accessorKey: 'address',
-            header: () => <div className="text-right">Address</div>,
+            header: () => <div className="text-center">Address</div>,
             cell: ({ row }) => {
                 const address = row.getValue('address') as string;
-                return <div className="text-right font-medium">{address}</div>;
+                return <div className="text-center font-medium">{address}</div>;
             },
         },
         {
             accessorKey: 'status',
-            header: () => <div className="text-right">Status</div>,
+            header: () => <div className="text-center">Status</div>,
             cell: ({ row }) => {
                 const status = row.getValue('status');
-                return <div className="text-right font-medium">{status === true ? 'Active' : 'Inactive'}</div>;
+                return <div className="text-center font-medium">{status === true ? 'Active' : 'Inactive'}</div>;
             },
         },
         {
@@ -133,7 +162,15 @@ function TeacherList({ teachers, institutions }: { teachers: Teacher[]; institut
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto my-10 w-full">
                 <h1 className="mb-4 text-center text-2xl font-bold">Teachers List</h1>
-                <DataTable columns={columns} data={teachers} openDrawer={openDrawer} title="Teacher" />
+                <DataTable
+                    columns={columns}
+                    data={teachers.data}
+                    openDrawer={openDrawer}
+                    title="Teacher"
+                    routeName={route('teachers.index')}
+                    paginationMeta={{ current_page: teachers.current_page, last_page: teachers.last_page, per_page: teachers.per_page }}
+                    filters={filters}
+                />
             </div>
             <DrawerContainer
                 drawerSettings={{ isOpen, onClose: closeDrawer, mode, itemId }}

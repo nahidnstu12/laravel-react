@@ -46,7 +46,22 @@ class TeacherController extends Controller
 
     $sortField = $request->sort_field ?? 'created_at';
     $sortDirection = $request->sort_direction ?? 'desc';
-    $query->orderBy($sortField, $sortDirection);
+
+    if ($sortField === 'institution.name') {
+      $query->join('institutions', 'teachers.institution_id', '=', 'institutions.id')
+        ->orderBy('institutions.name', $sortDirection)
+        ->select('teachers.*');
+    } elseif ($sortField === 'user.name') {
+      $query->join('users', 'teachers.user_id', '=', 'users.id')
+        ->orderBy('users.name', $sortDirection)
+        ->select('teachers.*');
+    } elseif ($sortField === 'user.email') {
+      $query->join('users', 'teachers.user_id', '=', 'users.id')
+        ->orderBy('users.email', $sortDirection)
+        ->select('teachers.*');
+    } else {
+      $query->orderBy($sortField, $sortDirection);
+    }
 
     $perPage = $request->per_page ?? 10;
     $teachers = $query->paginate($perPage);
@@ -109,52 +124,52 @@ class TeacherController extends Controller
     return response()->json($teacher);
   }
 
- public function update(Request $request, $id)
-{
+  public function update(Request $request, $id)
+  {
     $teacher = Teacher::with('user')->findOrFail($id);
 
     $validated = $request->validate([
-        'user_name' => 'required|string',
-        'user_email' => [
-            'required',
-            'email',
-            Rule::unique('users', 'email')->ignore($teacher->user->id),
-        ],
-        'pds_id' => 'nullable|string',
-        'designation' => 'nullable|string',
-        'joining_date' => 'nullable|date',
-        'address' => 'nullable|string',
-        'district' => 'nullable|string',
-        'status' => 'boolean',
-        'institution_id' => 'required|exists:institutions,id',
+      'user_name' => 'required|string',
+      'user_email' => [
+        'required',
+        'email',
+        Rule::unique('users', 'email')->ignore($teacher->user->id),
+      ],
+      'pds_id' => 'nullable|string',
+      'designation' => 'nullable|string',
+      'joining_date' => 'nullable|date',
+      'address' => 'nullable|string',
+      'district' => 'nullable|string',
+      'status' => 'boolean',
+      'institution_id' => 'required|exists:institutions,id',
     ]);
 
     DB::beginTransaction();
 
     try {
-        $teacher->user->update([
-            'name' => $validated['user_name'],
-            'email' => $validated['user_email'],
-        ]);
+      $teacher->user->update([
+        'name' => $validated['user_name'],
+        'email' => $validated['user_email'],
+      ]);
 
-        $teacher->update([
-            'institution_id' => $validated['institution_id'],
-            'pds_id' => $validated['pds_id'],
-            'designation' => $validated['designation'],
-            'joining_date' => $validated['joining_date'],
-            'address' => $validated['address'],
-            'district' => $validated['district'],
-            'status' => $validated['status'],
-        ]);
+      $teacher->update([
+        'institution_id' => $validated['institution_id'],
+        'pds_id' => $validated['pds_id'],
+        'designation' => $validated['designation'],
+        'joining_date' => $validated['joining_date'],
+        'address' => $validated['address'],
+        'district' => $validated['district'],
+        'status' => $validated['status'],
+      ]);
 
-        DB::commit();
+      DB::commit();
 
-        return to_route('teachers.index')->with('success', 'Teacher updated successfully!');
+      return to_route('teachers.index')->with('success', 'Teacher updated successfully!');
     } catch (\Throwable $th) {
-        DB::rollBack();
-        return redirect()->back()->with('error', 'Failed to update teacher. Please try again.');
+      DB::rollBack();
+      return redirect()->back()->with('error', 'Failed to update teacher. Please try again.');
     }
-}
+  }
 
 
   public function destroy($id)

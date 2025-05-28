@@ -10,6 +10,7 @@ import { Institution } from '@/types/feature-types';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import Form from './Form';
+import { CustomColumnDef } from '@/types/shared-types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -43,7 +44,7 @@ interface InstitutionListProps {
 function InstitutionList({ institutions, filters }: InstitutionListProps) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
-    const columns: ColumnDef<Institution>[] = [
+    const columns: CustomColumnDef<Institution>[] = [
         {
             id: 'select',
             header: ({ table }) => (
@@ -61,22 +62,13 @@ function InstitutionList({ institutions, filters }: InstitutionListProps) {
         },
         {
             accessorKey: 'name',
-            // header: ({ column }) => {
-            //     return (
-            //         <Button
-            //             variant="ghost"
-            //             onClick={() => {
-            //                 const direction = column.getIsSorted() === 'asc' ? 'desc' : 'asc';
-            //                 handleSortingChange('name', direction);
-            //             }}
-            //         >
-            //             Name
-            //             <ArrowUpDown className="ml-2 h-4 w-4" />
-            //         </Button>
-            //     );
-            // },
             header: () => <div className="text-center">Name</div>,
             cell: ({ row }) => <div className="lowercase">{row.getValue('name')}</div>,
+            enableColumnFilter: true,
+            filterField: 'input',
+            filterFn: (row, id, filterValue) => {
+                return row.original.name.toLowerCase().includes(filterValue.toLowerCase());
+            },
         },
         {
             accessorFn: (row) => row.user.name,
@@ -96,10 +88,11 @@ function InstitutionList({ institutions, filters }: InstitutionListProps) {
                 const email = row.original.user.email;
                 return <div className="text-center font-medium">{email}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'input',
             filterFn: (row, id, filterValue) => {
                 return row.original.user.email.toLowerCase().includes(filterValue.toLowerCase());
             },
-            enableSorting: false,
         },
         {
             accessorKey: 'registration_no',
@@ -135,9 +128,16 @@ function InstitutionList({ institutions, filters }: InstitutionListProps) {
 
                 return <div className="text-center font-medium">{type === 3 ? 'Collage' : type === 2 ? 'Secondary' : 'Primary'}</div>;
             },
-            filterFn: (row, id, filterValue) => {
-                return row.original.type.toLowerCase().includes(filterValue.toLowerCase());
-            },
+            // enableColumnFilter: true,
+            // filterField: 'select',
+            // filteredItems: [
+            //     { label: 'Primary', value: '1' },
+            //     { label: 'Secondary', value: '2' },
+            //     { label: 'Collage', value: '3' },
+            // ],
+            // filterFn: (row, id, filterValue) => {
+            //     return row.original.type.toLowerCase().includes(filterValue.toLowerCase());
+            // },
         },
         {
             id: 'actions',

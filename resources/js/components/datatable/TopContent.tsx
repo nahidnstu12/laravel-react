@@ -9,19 +9,12 @@ interface TopContentProps<T> {
     table: Table<T>;
     openDrawer: (mode: DrawerMode, id?: string) => void;
     title: string;
-    filterOptions?: {
-        [key: string]: {
-            type: 'input' | 'select';
-            options?: { label: string; value: string }[];
-            fetchOptions?: () => Promise<{ label: string; value: string }[]>;
-        };
-    };
 }
 
-export default function TopContent<T>({ table, openDrawer, title, filterOptions }: TopContentProps<T>) {
+export default function TopContent<T>({ table, openDrawer, title }: TopContentProps<T>) {
     return (
         <div className="flex items-center py-4">
-            <FilterModal table={table} filterOptions={filterOptions} />
+            <FilterModal table={table} />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="ml-auto">

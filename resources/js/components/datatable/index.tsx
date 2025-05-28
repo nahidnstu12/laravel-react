@@ -5,9 +5,10 @@ import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import BottomContent from './BottomContent';
 import TopContent from './TopContent';
+import { CustomColumnDef } from '@/types/shared-types';
 
 interface DataTableProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[];
+    columns: CustomColumnDef<TData>[];
     data: TData[];
     openDrawer: (mode: DrawerMode, id?: string) => void;
     title: string;
@@ -70,7 +71,7 @@ export default function DataTable<TData, TValue>({
 
     return (
         <>
-            <TopContent table={table} openDrawer={openDrawer} title={title} filterOptions={filters} />
+            <TopContent table={table} openDrawer={openDrawer} title={title} />
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>

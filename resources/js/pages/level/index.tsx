@@ -18,7 +18,28 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-function LevelList({ levels, institutions }: { levels: Level[]; institutions: Institution[] }) {
+interface LevelListProps {
+    levels: {
+        data: Level[];
+        current_page: number;
+        from: number;
+        last_page: number;
+        per_page: number;
+        to: number;
+        total: number;
+    };
+    filters: {
+        name?: string;
+        institution_id?: string;
+        status?: boolean;
+        sort_field?: string;
+        sort_direction?: 'asc' | 'desc';
+        per_page?: number;
+    };
+    institutions: Institution[];
+}
+
+function LevelList({ levels, institutions, filters }: LevelListProps) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
     const columns: ColumnDef<Level>[] = [
@@ -40,33 +61,35 @@ function LevelList({ levels, institutions }: { levels: Level[]; institutions: In
 
         {
             accessorKey: 'name',
-            header: () => <div className="text-right">Name</div>,
+            header: () => <div className="text-center">Name</div>,
             cell: ({ row }) => {
                 const name = row.getValue('name') as string;
-                return <div className="text-right font-medium">{name}</div>;
+                return <div className="text-center font-medium">{name}</div>;
             },
+
         },
         {
             accessorFn: (row) => row.institution?.name,
             id: 'institution.name',
-            header: () => <div className="text-right">Institution</div>,
+            header: () => <div className="text-center">Institution</div>,
             cell: ({ row }) => {
                 const institution = row.original.institution?.name;
-                return <div className="text-right font-medium">{institution || 'N/A'}</div>;
+                return <div className="text-center font-medium">{institution || 'N/A'}</div>;
             },
         },
 
         {
             accessorKey: 'status',
-            header: () => <div className="text-right">Status</div>,
+            header: () => <div className="text-center">Status</div>,
             cell: ({ row }) => {
                 const status = row.getValue('status');
-                return <div className="text-right font-medium">{status === true ? 'Active' : 'Inactive'}</div>;
+                return <div className="text-center font-medium">{status === true ? 'Active' : 'Inactive'}</div>;
             },
         },
         {
             id: 'actions',
             enableHiding: false,
+            enableSorting: false,
             header: () => <div className="text-center">Actions</div>,
             cell: ({ row }) => {
                 return (
@@ -99,11 +122,12 @@ function LevelList({ levels, institutions }: { levels: Level[]; institutions: In
             <div className="container mx-auto my-10 w-full">
                 <h1 className="mb-4 text-center text-2xl font-bold">Levels List</h1>
                 <DataTable columns={columns}
-                    data={levels}
+                    data={levels.data}
                     openDrawer={openDrawer}
                     title="Level"
-                    routeName="levels.index"
+                    routeName={route('levels.index')}
                     paginationMeta={{ current_page: levels.current_page, last_page: levels.last_page, per_page: levels.per_page }}
+                    filters={filters}
                 />
             </div>
             <DrawerContainer

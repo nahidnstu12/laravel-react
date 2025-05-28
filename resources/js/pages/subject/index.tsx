@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import useDrawer from '@/hooks/useDrawer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Institution, Level, Subject } from '@/types/feature-types';
+import { Institution, Subject } from '@/types/feature-types';
 import { ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import Form from './Form';
@@ -18,28 +18,50 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-function SubjectList({ subjects, institutions, levels }: { subjects: Subject[]; institutions: Institution[]; levels: Level[] }) {
+interface SubjectListProps {
+    subjects: {
+        data: Subject[];
+        current_page: number;
+        from: number;
+        last_page: number;
+        per_page: number;
+        to: number;
+        total: number;
+    };
+    filters: {
+        name?: string;
+        institution_id?: string;
+        level_id?: string;
+        status?: boolean;
+        sort_field?: string;
+        sort_direction?: 'asc' | 'desc';
+        per_page?: number;
+    };
+    institutions: Institution[];
+}
+
+function SubjectList({ subjects, institutions, filters }: SubjectListProps) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
-    const filterOptions = {
-        name: {
-            type: 'input' as const,
-        },
-        'institution.name': {
-            type: 'select' as const,
-            options: institutions.map((institution) => ({
-                label: institution.name,
-                value: institution.id.toString(),
-            })),
-        },
-        level: {
-            type: 'select' as const,
-            options: levels.map((level) => ({
-                label: level.name,
-                value: level.id.toString(),
-            })),
-        },
-    };
+    // const filterOptions = {
+    //     name: {
+    //         type: 'input' as const,
+    //     },
+    //     'institution.name': {
+    //         type: 'select' as const,
+    //         options: institutions.map((institution) => ({
+    //             label: institution.name,
+    //             value: institution.id.toString(),
+    //         })),
+    //     },
+    //     level: {
+    //         type: 'select' as const,
+    //         options: levels.map((level) => ({
+    //             label: level.name,
+    //             value: level.id.toString(),
+    //         })),
+    //     },
+    // };
 
     const columns: ColumnDef<Subject>[] = [
         {
@@ -60,35 +82,36 @@ function SubjectList({ subjects, institutions, levels }: { subjects: Subject[]; 
 
         {
             accessorKey: 'name',
-            header: () => <div className="text-right">Name</div>,
+            header: () => <div className="text-center">Name</div>,
             cell: ({ row }) => {
                 const name = row.getValue('name') as string;
-                return <div className="text-right font-medium">{name}</div>;
+                return <div className="text-center font-medium">{name}</div>;
             },
         },
         {
             accessorFn: (row) => row.institution.name,
             id: 'institution.name',
-            header: () => <div className="text-right">Institution</div>,
+            header: () => <div className="text-center">Institution</div>,
             cell: ({ row }) => {
                 const institution = row.original.institution.name;
-                return <div className="text-right font-medium">{institution}</div>;
+                return <div className="text-center font-medium">{institution}</div>;
             },
         },
         {
-            accessorKey: 'level',
-            header: () => <div className="text-right">Level</div>,
+            accessorFn: (row) => row.level.name,
+            id: 'level.name',
+            header: () => <div className="text-center">Level</div>,
             cell: ({ row }) => {
                 const level = row.original.level.name;
-                return <div className="text-right font-medium">{level}</div>;
+                return <div className="text-center font-medium">{level}</div>;
             },
         },
         {
             accessorKey: 'status',
-            header: () => <div className="text-right">Status</div>,
+            header: () => <div className="text-center">Status</div>,
             cell: ({ row }) => {
                 const status = row.getValue('status');
-                return <div className="text-right font-medium">{status === true ? 'Active' : 'Inactive'}</div>;
+                return <div className="text-center font-medium">{status === true ? 'Active' : 'Inactive'}</div>;
             },
         },
         {
@@ -125,7 +148,15 @@ function SubjectList({ subjects, institutions, levels }: { subjects: Subject[]; 
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto my-10 w-full">
                 <h1 className="mb-4 text-center text-2xl font-bold">Subjects List</h1>
-                <DataTable columns={columns} data={subjects} openDrawer={openDrawer} title="Subject" filterOptions={filterOptions} />
+                <DataTable
+                    columns={columns}
+                    data={subjects.data}
+                    openDrawer={openDrawer}
+                    title="Subject"
+                    routeName={route('subjects.index')}
+                    paginationMeta={{ current_page: subjects.current_page, last_page: subjects.last_page, per_page: subjects.per_page }}
+                    filters={filters}
+                />
             </div>
             <DrawerContainer
                 drawerSettings={{ isOpen, onClose: closeDrawer, mode, itemId }}
