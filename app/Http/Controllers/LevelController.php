@@ -16,7 +16,7 @@ class LevelController extends Controller
 
     if ($request->has('name')) {
       $name = $request->name;
-      $query->where('name', 'like', "%{$name}%");
+      $query->where('name', 'ilike', "%{$name}%");
     }
 
     if ($request->has('status')) {

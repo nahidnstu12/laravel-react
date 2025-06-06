@@ -1,48 +1,27 @@
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DrawerMode } from '@/hooks/useDrawer';
 import { Table } from '@tanstack/react-table';
-import { ChevronDown, Plus } from 'lucide-react';
 import FilterModal from './FilterModal';
 
 interface TopContentProps<T> {
     table: Table<T>;
     openDrawer: (mode: DrawerMode, id?: string) => void;
     title: string;
+    onFilterChange: (filters: Record<string, any>) => void;
+    filters?: Record<string, any>;
+    totalItems: number;
 }
 
-export default function TopContent<T>({ table, openDrawer, title }: TopContentProps<T>) {
+export default function TopContent<T>({ table, openDrawer, title, onFilterChange, filters = {}, totalItems }: TopContentProps<T>) {
     return (
-        <div className="flex items-center py-4">
-            <FilterModal table={table} />
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="ml-auto">
-                        Columns <ChevronDown />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    {table
-                        .getAllColumns()
-                        .filter((column) => column.getCanHide())
-                        .map((column) => {
-                            return (
-                                <DropdownMenuCheckboxItem
-                                    key={column.id}
-                                    className="capitalize"
-                                    checked={column.getIsVisible()}
-                                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                                >
-                                    {column.id}
-                                </DropdownMenuCheckboxItem>
-                            );
-                        })}
-                </DropdownMenuContent>
-            </DropdownMenu>
-            <Button variant="outline" className="ml-1 cursor-pointer" onClick={() => openDrawer('create')}>
-                <Plus />
-                Add {title}
-            </Button>
+        <div className="flex items-center justify-between py-4">
+            <h2 className="text-lg font-semibold">
+                {title} <span className="text-sm text-gray-500">(showing {totalItems} items)</span>
+            </h2>
+            <div className="flex items-center space-x-2">
+                <FilterModal table={table} onFilterChange={onFilterChange} filters={filters} />
+                <Button onClick={() => openDrawer('create')}>Add New</Button>
+            </div>
         </div>
     );
 }

@@ -17,7 +17,7 @@ class SubjectController extends Controller
 
     if ($request->has('name')) {
       $name = $request->name;
-      $query->where('name', 'like', "%{$name}%");
+      $query->where('name', 'ilike', "%{$name}%");
     }
 
     if ($request->has('status')) {
@@ -51,10 +51,12 @@ class SubjectController extends Controller
     $subjects = $query->paginate($perPage);
 
     $institutions = Institution::all();
+    $levels = Level::all();
     return Inertia::render('subject/index', [
       'subjects' => $subjects,
       'institutions' => $institutions,
       'filters' => $request->only(['name', 'status', 'institution_id', 'level_id', 'sort_field', 'sort_direction', 'per_page']),
+      'levels' => $levels,
     ]);
   }
 

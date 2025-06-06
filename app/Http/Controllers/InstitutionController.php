@@ -33,7 +33,7 @@ class InstitutionController extends Controller
 
     // Individual filters
     if ($request->has('name')) {
-      $query->where('name', 'like', "%{$request->name}%");
+      $query->where('name', 'ilike', "%{$request->name}%");
     }
 
     if ($request->has('registration_no')) {
@@ -46,6 +46,12 @@ class InstitutionController extends Controller
 
     if ($request->has('status') && $request->status !== '') {
       $query->where('status', $request->status);
+    }
+
+    if ($request->has('user_email') && $request->user_email !== '') {
+      $query->whereHas('user', function ($q) use ($request) {
+        $q->where('email', 'like', "%{$request->user_email}%");
+      });
     }
 
     // Sorting
@@ -62,7 +68,7 @@ class InstitutionController extends Controller
 
     return Inertia::render('institution/index', [
       'institutions' => $institutions,
-      'filters' => $request->only(['search', 'name', 'registration_no', 'type', 'status', 'sort_field', 'sort_direction', 'per_page']),
+      'filters' => $request->only(['search', 'name', 'registration_no', 'type', 'status', 'sort_field', 'sort_direction', 'per_page', 'user_email']),
 
     ]);
   }

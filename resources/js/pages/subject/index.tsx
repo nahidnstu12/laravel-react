@@ -6,10 +6,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import useDrawer from '@/hooks/useDrawer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Institution, Subject } from '@/types/feature-types';
-import { ColumnDef } from '@tanstack/react-table';
+import { Institution, Level, Subject } from '@/types/feature-types';
+import { CustomColumnDef } from '@/types/shared-types';
+import axios from 'axios';
 import { Eye, Pencil, Trash } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import Form from './Form';
+import { useDatatableStore } from '@/store/datatableStore';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -38,32 +41,34 @@ interface SubjectListProps {
         per_page?: number;
     };
     institutions: Institution[];
+    levels: Level[];
 }
 
-function SubjectList({ subjects, institutions, filters }: SubjectListProps) {
+function SubjectList({ subjects, institutions, levels, filters }: SubjectListProps) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
+    const {filters: globalFilters} = useDatatableStore()
 
-    // const filterOptions = {
-    //     name: {
-    //         type: 'input' as const,
-    //     },
-    //     'institution.name': {
-    //         type: 'select' as const,
-    //         options: institutions.map((institution) => ({
-    //             label: institution.name,
-    //             value: institution.id.toString(),
-    //         })),
-    //     },
-    //     level: {
-    //         type: 'select' as const,
-    //         options: levels.map((level) => ({
-    //             label: level.name,
-    //             value: level.id.toString(),
-    //         })),
-    //     },
-    // };
+    const [selectedLevel, setSelectedLevel] = useState<any[]>([]);
 
-    const columns: ColumnDef<Subject>[] = [
+    const fetchLevels = async (institutionId: string | number) => {
+        try {
+            const response = await axios.get(route('api.institutions.levels', institutionId));
+            setSelectedLevel(response.data);
+        } catch (error) {
+            console.error('Error fetching levels:', error);
+            setSelectedLevel([]);
+        }
+    };
+
+    useEffect(() => {
+        console.log('filters', filters.institution_id, globalFilters.institution_id);
+        if (globalFilters.institution_id) {
+            console.log('fetching levels');
+            fetchLevels(globalFilters.institution_id);
+        }
+    }, [globalFilters.institution_id]);
+
+    const columns: CustomColumnDef<Subject>[] = [
         {
             id: 'select',
             header: ({ table }) => (
@@ -87,24 +92,32 @@ function SubjectList({ subjects, institutions, filters }: SubjectListProps) {
                 const name = row.getValue('name') as string;
                 return <div className="text-center font-medium">{name}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'input',
         },
         {
             accessorFn: (row) => row.institution.name,
-            id: 'institution.name',
+            id: 'institution_id',
             header: () => <div className="text-center">Institution</div>,
             cell: ({ row }) => {
                 const institution = row.original.institution.name;
                 return <div className="text-center font-medium">{institution}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'select',
+            filteredItems: institutions.map((institution) => ({ label: institution.name, value: institution.id })),
         },
         {
             accessorFn: (row) => row.level.name,
-            id: 'level.name',
+            id: 'level_id',
             header: () => <div className="text-center">Level</div>,
             cell: ({ row }) => {
                 const level = row.original.level.name;
                 return <div className="text-center font-medium">{level}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'select',
+            filteredItems: selectedLevel?.map((level) => ({ label: level.name, value: level.id })) || [],
         },
         {
             accessorKey: 'status',
@@ -113,6 +126,12 @@ function SubjectList({ subjects, institutions, filters }: SubjectListProps) {
                 const status = row.getValue('status');
                 return <div className="text-center font-medium">{status === true ? 'Active' : 'Inactive'}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'select',
+            filteredItems: [
+                { label: 'Active', value: 'true' },
+                { label: 'Inactive', value: 'false' },
+            ],
         },
         {
             id: 'actions',
@@ -154,7 +173,12 @@ function SubjectList({ subjects, institutions, filters }: SubjectListProps) {
                     openDrawer={openDrawer}
                     title="Subject"
                     routeName={route('subjects.index')}
-                    paginationMeta={{ current_page: subjects.current_page, last_page: subjects.last_page, per_page: subjects.per_page }}
+                    paginationMeta={{
+                        current_page: subjects.current_page,
+                        last_page: subjects.last_page,
+                        per_page: subjects.per_page,
+                        total: subjects.total,
+                    }}
                     filters={filters}
                 />
             </div>

@@ -7,7 +7,7 @@ import useDrawer from '@/hooks/useDrawer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Institution, Teacher } from '@/types/feature-types';
-import { ColumnDef } from '@tanstack/react-table';
+import { CustomColumnDef } from '@/types/shared-types';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import Form from './Form';
 
@@ -37,12 +37,13 @@ interface TeacherListProps {
         per_page?: number;
     };
     institutions: Institution[];
+    designations: any;
 }
 
-function TeacherList({ teachers, institutions, filters }: TeacherListProps) {
+function TeacherList({ teachers, institutions, designations, filters }: TeacherListProps) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
-    const columns: ColumnDef<Teacher>[] = [
+    const columns: CustomColumnDef<Teacher>[] = [
         {
             id: 'select',
             header: ({ table }) => (
@@ -61,30 +62,37 @@ function TeacherList({ teachers, institutions, filters }: TeacherListProps) {
 
         {
             accessorFn: (row) => row.user.name,
-            id: 'user.name',
+            id: 'user_name',
             header: () => <div className="text-center">User Name</div>,
             cell: ({ row }) => {
                 const username = row.original.user.name;
                 return <div className="text-center font-medium">{username}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'input',
         },
         {
             accessorFn: (row) => row.user.email,
-            id: 'user.email',
+            id: 'user_email',
             header: () => <div className="text-center">User Email</div>,
             cell: ({ row }) => {
                 const email = row.original.user.email;
                 return <div className="text-center font-medium">{email}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'input',
         },
         {
             accessorFn: (row) => row.institution.name,
-            id: 'institution.name',
+            id: 'institution_id',
             header: () => <div className="text-center">Institution</div>,
             cell: ({ row }) => {
                 const institution = row.original.institution.name;
                 return <div className="text-center font-medium">{institution}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'select',
+            filteredItems: institutions.map((institution) => ({ label: institution.name, value: institution.id })),
         },
         {
             accessorKey: 'pds_id',
@@ -102,6 +110,9 @@ function TeacherList({ teachers, institutions, filters }: TeacherListProps) {
                 const designation = row.getValue('designation') as string;
                 return <div className="text-center font-medium">{designation}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'select',
+            filteredItems: designations.original.map((designation: string) => ({ label: designation, value: designation })),
         },
         {
             accessorKey: 'joining_date',
@@ -110,6 +121,8 @@ function TeacherList({ teachers, institutions, filters }: TeacherListProps) {
                 const joining_date = row.getValue('joining_date') as string;
                 return <div className="text-center font-medium">{joining_date}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'daterange',
         },
 
         {
@@ -127,6 +140,12 @@ function TeacherList({ teachers, institutions, filters }: TeacherListProps) {
                 const status = row.getValue('status');
                 return <div className="text-center font-medium">{status === true ? 'Active' : 'Inactive'}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'select',
+            filteredItems: [
+                { label: 'Active', value: 'true' },
+                { label: 'Inactive', value: 'false' },
+            ],
         },
         {
             id: 'actions',
@@ -168,7 +187,12 @@ function TeacherList({ teachers, institutions, filters }: TeacherListProps) {
                     openDrawer={openDrawer}
                     title="Teacher"
                     routeName={route('teachers.index')}
-                    paginationMeta={{ current_page: teachers.current_page, last_page: teachers.last_page, per_page: teachers.per_page }}
+                    paginationMeta={{
+                        current_page: teachers.current_page,
+                        last_page: teachers.last_page,
+                        per_page: teachers.per_page,
+                        total: teachers.total,
+                    }}
                     filters={filters}
                 />
             </div>

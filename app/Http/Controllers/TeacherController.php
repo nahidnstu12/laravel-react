@@ -21,7 +21,19 @@ class TeacherController extends Controller
 
     if ($request->has('name')) {
       $name = $request->name;
-      $query->where('name', 'like', "%{$name}%");
+      $query->where('name', 'ilike', "%{$name}%");
+    }
+
+    if ($request->has('user_email')) {
+      $query->whereHas('user', function ($q) use ($request) {
+        $q->where('email', 'ilike', "%{$request->user_email}%");
+      });
+    }
+
+    if ($request->has('user_name')) {
+      $query->whereHas('user', function ($q) use ($request) {
+        $q->where('name', 'ilike', "%{$request->user_name}%");
+      });
     }
 
     if ($request->has('status')) {
@@ -40,9 +52,17 @@ class TeacherController extends Controller
       $query->where('designation', $request->designation);
     }
 
-    if ($request->has('joining_date')) {
-      $query->where('joining_date', $request->joining_date);
-    }
+    if ($request->has('joining_date_from') && $request->has('joining_date_to')) {
+      $query->whereBetween('joining_date', [
+          $request->joining_date_from,
+          $request->joining_date_to
+      ]);
+  } elseif ($request->has('joining_date_from')) {
+      $query->where('joining_date', '>=', $request->joining_date_from);
+  } elseif ($request->has('joining_date_to')) {
+      $query->where('joining_date', '<=', $request->joining_date_to);
+  }
+    // dd($query->toSql(), $request->joining_date_from, $request->joining_date_to);
 
     $sortField = $request->sort_field ?? 'created_at';
     $sortDirection = $request->sort_direction ?? 'desc';
@@ -64,14 +84,24 @@ class TeacherController extends Controller
     }
 
     $perPage = $request->per_page ?? 10;
+    // dd($query->toSql());
     $teachers = $query->paginate($perPage);
 
     $institutions = Institution::all();
+    $designations = $this->getDesignations();
     return Inertia::render('teacher/index', [
       'teachers' => $teachers,
       'institutions' => $institutions,
-      'filters' => $request->only(['name', 'status', 'institution_id', 'sort_field', 'sort_direction', 'per_page']),
+      'designations' => $designations,
+      'filters' => $request->only(['name', 'status', 'institution_id', 'sort_field', 'sort_direction', 'per_page', 'user_email', 'user_name', 'designation', 'joining_date_from', 'joining_date_to']),
     ]);
+  }
+
+  public function getDesignations()
+  {
+    $designations = Teacher::distinct()->pluck('designation');
+
+    return response()->json($designations);
   }
 
   public function store(Request $request)

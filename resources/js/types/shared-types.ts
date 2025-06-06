@@ -9,6 +9,6 @@ export interface FormProps {
 }
 
 export type CustomColumnDef<T> = ColumnDef<T> & {
-  filterField?: 'input' | 'select';
+  filterField?: 'input' | 'select' | 'daterange';
   filteredItems?: { label: string; value: string }[];
 };

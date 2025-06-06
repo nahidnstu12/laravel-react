@@ -7,7 +7,7 @@ import useDrawer from '@/hooks/useDrawer';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Institution, Level } from '@/types/feature-types';
-import { ColumnDef } from '@tanstack/react-table';
+import { CustomColumnDef } from '@/types/shared-types';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import Form from './Form';
 
@@ -42,7 +42,7 @@ interface LevelListProps {
 function LevelList({ levels, institutions, filters }: LevelListProps) {
     const { isOpen, mode, itemId, openDrawer, closeDrawer } = useDrawer();
 
-    const columns: ColumnDef<Level>[] = [
+    const columns: CustomColumnDef<Level>[] = [
         {
             id: 'select',
             header: ({ table }) => (
@@ -66,16 +66,21 @@ function LevelList({ levels, institutions, filters }: LevelListProps) {
                 const name = row.getValue('name') as string;
                 return <div className="text-center font-medium">{name}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'input',
 
         },
         {
             accessorFn: (row) => row.institution?.name,
-            id: 'institution.name',
+            id: 'institution_id',
             header: () => <div className="text-center">Institution</div>,
             cell: ({ row }) => {
                 const institution = row.original.institution?.name;
                 return <div className="text-center font-medium">{institution || 'N/A'}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'select',
+            filteredItems: institutions.map((institution) => ({ label: institution.name, value: institution.id })),
         },
 
         {
@@ -85,6 +90,12 @@ function LevelList({ levels, institutions, filters }: LevelListProps) {
                 const status = row.getValue('status');
                 return <div className="text-center font-medium">{status === true ? 'Active' : 'Inactive'}</div>;
             },
+            enableColumnFilter: true,
+            filterField: 'select',
+            filteredItems: [
+                { label: 'Active', value: 'true' },
+                { label: 'Inactive', value: 'false' },
+            ],
         },
         {
             id: 'actions',
@@ -126,7 +137,12 @@ function LevelList({ levels, institutions, filters }: LevelListProps) {
                     openDrawer={openDrawer}
                     title="Level"
                     routeName={route('levels.index')}
-                    paginationMeta={{ current_page: levels.current_page, last_page: levels.last_page, per_page: levels.per_page }}
+                    paginationMeta={{
+                        current_page: levels.current_page,
+                        last_page: levels.last_page,
+                        per_page: levels.per_page,
+                        total: levels.total,
+                    }}
                     filters={filters}
                 />
             </div>
